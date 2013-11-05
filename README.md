@@ -48,6 +48,7 @@ NOTE: You may need to make sure CGI is enabled in your Apache installation. To d
 LoadModule cgi_module modules/mod_cgi.so
 
 Then restart Apache: # /etc/rc.d/rc.httpd restart
+
 And you should be all set. 
 
 *****
@@ -83,4 +84,4 @@ That's it.
 *****
 Installation on Windows
 
-We haven't made SOLVE-Brain Windows compatible yet. You can probably this through installing Cygwin (http://ww.cygwin.com/), but we haven't tested in this environment yet.
+We haven't made SOLVE-Brain Windows compatible yet. You can probably do this through installing Cygwin (http://ww.cygwin.com/), but we haven't tested in this environment yet.
