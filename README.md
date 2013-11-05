@@ -6,6 +6,7 @@ Brain-specific annotation of next-generation sequencing data.
 Release date 2 Nov 2013
 
 Authors: Dalia Ghoneim, Alex Paciorkowski
+
 The Paciorkowski Lab
 
 *****
@@ -46,8 +47,7 @@ NOTE: You may need to make sure CGI is enabled in your Apache installation. To d
 
 LoadModule cgi_module modules/mod_cgi.so
 
-Then restart Apache:
-#/etc/rc.d/rc.httpd restart
+Then restart Apache: # /etc/rc.d/rc.httpd restart
 And you should be all set. 
 
 *****
