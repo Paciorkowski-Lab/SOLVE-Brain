@@ -6,6 +6,7 @@
 #skips the first line of a vcf (in case there is a header line) and prints the index number and the content of each column in this second line
 #prints to stdout
 #usage: perl determine_index.pl <vcf_file>
+#Dalia Ghoneim
 
 use strict;
 use warnings;
