@@ -1,6 +1,5 @@
 #!/usr/bin/perl
 #
-#filter.pl
 #08/22/2013 - allow user to enter proband index, default is still 35
 #06/12/2013
 #
