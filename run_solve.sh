@@ -48,8 +48,7 @@ usage="See usage below:\n\nrequired:\n-P <pedigree> . Indicates the pedigree hyp
 #-i <proband index>. Integer representing the index (column) that holds the proband in supplied vcf. default value is 35; however, this value can vary depending on how the vcf has been annotated. Remeber: when counting the index, start at 0 not 1! 
 #
 #at least ONE of the following required:
-#-S <snv_file> The input SNV vcf file. Must be annotated with gene name in column index [1] and in the following order: proband, father
-, mother.
+#-S <snv_file> The input SNV vcf file. Must be annotated with gene name in column index [1] and in the following order: proband, father, mother.
 #-I <indel_file> The input INDEL vcf file. Must be annotated with gene name in column index [1] and in the following order: proband, father, mother.
 #
 #optional:
