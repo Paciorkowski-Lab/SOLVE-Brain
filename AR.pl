@@ -3,9 +3,9 @@
 #AR.pl
 #10/25/2013
 #
-#ar.pl <annotated_vcf.vcf>
+#AR.pl <annotated_vcf.vcf>
 #filters annotated vcf for Autosomal Recessive variants.
-#usage: perl ar.pl [options] <vcf_file>
+#usage: perl AR.pl [options] <vcf_file>
 #options:       --PROBAND=<proband_index>. Defaults to 35
 #               --NUM_AFFECTED=<number_of_affecteds>. Defaults to 1.
 #Dalia Ghoneim
