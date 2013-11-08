@@ -1,12 +1,12 @@
 #!/usr/bin/perl
 #
-#comp_het.pl
+#comp_het_proband.pl
 #08/28/2013 - allows user to spcify proband index
 #08/22/2013 - previous version skips pedigree analysis of initial call of multihit gene
 #05/29/2013
 #Finds variants that are compound heterozygous and prints them: proband 0/1, parent1 0/1, parent2 0/0 AND proband 0/1, parent1 0/0, and parent2 0/1
 #uses vcf annotated with annovar as input that contains only variants with multihits. Run multi_hits.pl first.
-#to run: perl comp_het.pl [options] <multi_hits_output_file>
+#to run: perl comp_het_proband.pl [options] <multi_hits_output_file>
 # available options:    --PROBAND=[integer]  this allows the user to specify the proband index. Default value is 35
 #
 #Dalia Ghoneim
