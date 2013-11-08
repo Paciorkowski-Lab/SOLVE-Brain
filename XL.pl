@@ -2,11 +2,11 @@
 #
 #10/01/2013 - allow user to enter proband index, default is still 35
 #
-#AD_father.pl usage: AD_father.pl [options] annotated_vcf.vcf>
+#XL.pl usage: XL.pl [options] annotated_vcf.vcf>
 #options:
 #--PROBAND=<proband_index> . Defaults to 35
 #--NUM_AFFECTED=<number_of_affecteds> . Defaults to 1.
-#Filters annotated vcf for Autosomal Dominant variants. User can supply the proband index. Default value is 35. Also can handle multiple affecteds. Default NUM_AFFECTED is 1.
+#Filters annotated vcf X-linked variants in male probands only. User can supply the proband index. Default value is 35. Also can handle multiple affecteds. Default NUM_AFFECTED is 1.
 #The order of the input vcf is important. Must follow this order: <proband_1> <proband_n> <father> <mother>
 #Dalia Ghoneim
 #
