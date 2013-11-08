@@ -7,6 +7,7 @@
 #relationship with these same genes.
 #to run: perl comp_het_indels <snv_annotated_with_annovar>.vcf <indel_annotated_with_annovar>.vcf
 #
+#Dalia Ghoneim
 #
 use strict;
 use warnings;
