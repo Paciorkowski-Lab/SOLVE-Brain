@@ -156,7 +156,7 @@ mother_index=$(($proband_index + 2))
 #where is ouput going? if no output path was indicated, output will be the same path base as input
 if [[ $output_indicated = 1 ]]; then
         snv_basename="$output_base"_snv
-        indel_basename="$output_base"_snv
+        indel_basename="$output_base"_indel
 fi
 
 #remove synonymous SNVs unless otherwise indicated
