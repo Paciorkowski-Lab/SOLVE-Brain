@@ -59,6 +59,7 @@ usage="See usage below:\n\nrequired:\n-P <pedigree> . Indicates the pedigree hyp
 #-q quality filter. Remove all variants in the proband that had a GQ score lower than 99.
 #-d keep variants in dbSNP. The default is to remove variants found in dbSNP
 
+echo "Running SOLVE-Brain-1-0-1"
 while getopts ":snqdP:i:k:I:S:O:" opt; do
 case $opt in
         s)
@@ -70,7 +71,7 @@ case $opt in
                 remove_nonframe=0
                 ;;
         q)
-                echo "-q you have opted to remove variants with GQ score less than 99"
+                echo "-q you have elected to remove variants with GQ score less than 99"
                 gq99_filter=1
                 ;;
         d)
@@ -78,7 +79,7 @@ case $opt in
                 remove_dbSNPs=0
                 ;;
         P)
-                echo "-P you have chosen the following pedigree hypothesis: $OPTARG"
+                echo "-P you have elected to filter by the following pedigree hypothesis: $OPTARG"
                 pedigree=$OPTARG
                 pedigree_supplied=1
                 ;;
@@ -123,7 +124,7 @@ shift $((OPTIND-1))
 
 #check that pedigree was provided by the user and that it is a valid pedigree value. If not, exit.
 if [[ $pedigree_supplied = 0 ]]; then
-        printf "Did not supply required argument -P <pedigree>. Please provide your pedigree hypothesis. $usage"
+        printf "You did not supply required argument -P <pedigree>. Please provide your pedigree hypothesis. $usage"
         exit 1
 fi
 if [[ "$pedigree" != "AD" && "$pedigree" != "AR" && "$pedigree" != "DN" && "$pedigree" != "XL" ]]; then
@@ -156,7 +157,7 @@ mother_index=$(($proband_index + 2))
 #where is ouput going? if no output path was indicated, output will be the same path base as input
 if [[ $output_indicated = 1 ]]; then
         snv_basename="$output_base"_snv
-        indel_basename="$output_base"_snv
+        indel_basename="$output_base"_indel
 fi
 
 #remove synonymous SNVs unless otherwise indicated
@@ -246,10 +247,10 @@ elif [ "$pedigree" == "AR" ]; then
         if [[ $snv_supplied = 1 ]]; then
                 perl $HOME/SOLVE-Brain-1-0-1/multi_hits.pl $active_snv_vcf > "$snv_basename"_multihits.vcf
                 perl $HOME/SOLVE-Brain-1-0-1/comp_het_proband.pl --PROBAND=$proband_index "$snv_basename"_multihits.vcf > "$snv_basename"_CH.vcf
-                perl $HOME/SOLVE-Brain-1-0-1/AR.pl --PROBAND=$proband_index $active_snv_vcf > "$snv_basename"_AR.vcf
+                perl $HOME/SOLVE-Brain-1-0-1/AR.pl --PROBAND=$proband_index $active_snv_vcf > "$snv_basename"_HM.vcf
                 snv_2=1
                 active_snv_vcf="$snv_basename"_CH.vcf
-                snv_vcf_2="$snv_basename"_AR.vcf
+                snv_vcf_2="$snv_basename"_HM.vcf
                 snv_basename=${active_snv_vcf%.*}
                 snv_basename_2=${snv_vcf_2%.*}
 
@@ -259,10 +260,10 @@ elif [ "$pedigree" == "AR" ]; then
         if [[ $indel_supplied = 1 ]]; then
                 perl $HOME/SOLVE-Brain-1-0-1/multi_hits.pl $active_indel_vcf > "$indel_basename"_multihits.vcf
                 perl $HOME/SOLVE-Brain-1-0-1/comp_het_proband.pl --PROBAND=$proband_index "$indel_basename"_multihits.vcf > "$indel_basename"_CH.vcf
-                perl $HOME/SOLVE-Brain-1-0-1/AR.pl --PROBAND=$proband_index $active_indel_vcf > "$indel_basename"_AR.vcf
+                perl $HOME/SOLVE-Brain-1-0-1/AR.pl --PROBAND=$proband_index $active_indel_vcf > "$indel_basename"_HM.vcf
                 indel_2=1
                 active_indel_vcf="$indel_basename"_CH.vcf
-                indel_vcf_2="$indel_basename"_AR.vcf
+                indel_vcf_2="$indel_basename"_HM.vcf
                 indel_basename=${active_indel_vcf%.*}
                 indel_basename_2=${indel_vcf_2%.*}
 
