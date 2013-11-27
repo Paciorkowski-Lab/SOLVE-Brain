@@ -195,12 +195,12 @@ fi
 if [[ $gq99_filter = 1 ]]; then
 
         if [[ $snv_supplied = 1 ]]; then
-                perl $HOME/SOLVE-Brain/GQ99.pl --PROBAND=$proband_index $active_snv_vcf > "$snv_basename"_GQ99.vcf
+                perl GQ99.pl --PROBAND=$proband_index $active_snv_vcf > "$snv_basename"_GQ99.vcf
                 active_snv_vcf="$snv_basename"_GQ99.vcf
                 snv_basename=${active_snv_vcf%.*}
         fi
         if [[ $indel_supplied = 1 ]]; then
-                perl $HOME/SOLVE-Brain/GQ99.pl --PROBAND=$proband_index $active_indel_vcf > "$indel_basename"_GQ99.vcf
+                perl GQ99.pl --PROBAND=$proband_index $active_indel_vcf > "$indel_basename"_GQ99.vcf
                 active_indel_vcf="$indel_basename"_GQ99.vcf
                 indel_basename=${active_indel_vcf%.*}
         fi
@@ -210,8 +210,8 @@ fi
 if [ "$pedigree" == "AD" ]; then
 
         if [[ $snv_supplied = 1 ]]; then
-                perl $HOME/SOLVE-Brain/AD_father.pl --PROBAND=$proband_index $active_snv_vcf > "$snv_basename"_AD_father.vcf
-                perl $HOME/SOLVE-Brain/AD_mother.pl --PROBAND=$proband_index $active_snv_vcf > "$snv_basename"_AD_mother.vcf
+                perl AD_father.pl --PROBAND=$proband_index $active_snv_vcf > "$snv_basename"_AD_father.vcf
+                perl AD_mother.pl --PROBAND=$proband_index $active_snv_vcf > "$snv_basename"_AD_mother.vcf
                 snv_2=1
                 active_snv_vcf="$snv_basename"_AD_father.vcf
                 snv_vcf_2="$snv_basename"_AD_mother.vcf
@@ -219,8 +219,8 @@ if [ "$pedigree" == "AD" ]; then
                 snv_basename_2=${snv_vcf_2%.*}
         fi
         if [[ $indel_supplied = 1 ]]; then
-                perl $HOME/SOLVE-Brain/AD_father.pl --PROBAND=$proband_index $active_indel_vcf > "$indel_basename"_AD_father.vcf
-                perl $HOME/SOLVE-Brain/AD_mother.pl --PROBAND=$proband_index $active_indel_vcf > "$indel_basename"_AD_mother.vcf
+                perl AD_father.pl --PROBAND=$proband_index $active_indel_vcf > "$indel_basename"_AD_father.vcf
+                perl AD_mother.pl --PROBAND=$proband_index $active_indel_vcf > "$indel_basename"_AD_mother.vcf
                 indel_2=1
                 active_indel_vcf="$indel_basename"_AD_father.vcf
                 indel_vcf_2="$indel_basename"_AD_mother.vcf
@@ -233,21 +233,21 @@ elif [ "$pedigree" == "AR" ]; then
 
         #SNV+INDEL compound hets
         if [[ $snv_supplied = 1 && $indel_supplied = 1 ]]; then
-                perl $HOME/SOLVE-Brain/comp_het_indels.pl --PROBAND=$proband_index $active_snv_vcf $active_indel_vcf > "$snv_basename"_indels_CH_genes.txt
+                perl comp_het_indels.pl --PROBAND=$proband_index $active_snv_vcf $active_indel_vcf > "$snv_basename"_indels_CH_genes.txt
                 active_snv_indel_list="$snv_basename"_indels_CH_genes.txt
-                perl $HOME/SOLVE-Brain/print_2_vcf.pl --PROBAND=$proband_index "$snv_basename"_indels_CH_genes.txt $active_snv_vcf > "$snv_basename"_indels_CH.vcf
-                perl $HOME/SOLVE-Brain/print_2_vcf.pl --PROBAND=$proband_index "$snv_basename"_indels_CH_genes.txt $active_indel_vcf >> "$snv_basename"_indels_CH.vcf
+                perl print_2_vcf.pl --PROBAND=$proband_index "$snv_basename"_indels_CH_genes.txt $active_snv_vcf > "$snv_basename"_indels_CH.vcf
+                perl print_2_vcf.pl --PROBAND=$proband_index "$snv_basename"_indels_CH_genes.txt $active_indel_vcf >> "$snv_basename"_indels_CH.vcf
 
                 if [[ $known_gene_list != 0 ]]; then
-                perl $HOME/SOLVE-Brain/shared_genes.pl $known_gene_list $active_snv_indel_list > "$snv_basename"_indels_CH_known_genes.txt
+                perl shared_genes.pl $known_gene_list $active_snv_indel_list > "$snv_basename"_indels_CH_known_genes.txt
                 fi
         fi
 
         #SNV + SNV compound hets and AR
         if [[ $snv_supplied = 1 ]]; then
-                perl $HOME/SOLVE-Brain/multi_hits.pl $active_snv_vcf > "$snv_basename"_multihits.vcf
-                perl $HOME/SOLVE-Brain/comp_het_proband.pl --PROBAND=$proband_index "$snv_basename"_multihits.vcf > "$snv_basename"_CH.vcf
-                perl $HOME/SOLVE-Brain/AR.pl --PROBAND=$proband_index $active_snv_vcf > "$snv_basename"_HM.vcf
+                perl multi_hits.pl $active_snv_vcf > "$snv_basename"_multihits.vcf
+                perl comp_het_proband.pl --PROBAND=$proband_index "$snv_basename"_multihits.vcf > "$snv_basename"_CH.vcf
+                perl AR.pl --PROBAND=$proband_index $active_snv_vcf > "$snv_basename"_HM.vcf
                 snv_2=1
                 active_snv_vcf="$snv_basename"_CH.vcf
                 snv_vcf_2="$snv_basename"_HM.vcf
@@ -258,9 +258,9 @@ elif [ "$pedigree" == "AR" ]; then
 
         #INDEL + INDEL compound hets and AR
         if [[ $indel_supplied = 1 ]]; then
-                perl $HOME/SOLVE-Brain/multi_hits.pl $active_indel_vcf > "$indel_basename"_multihits.vcf
-                perl $HOME/SOLVE-Brain/comp_het_proband.pl --PROBAND=$proband_index "$indel_basename"_multihits.vcf > "$indel_basename"_CH.vcf
-                perl $HOME/SOLVE-Brain/AR.pl --PROBAND=$proband_index $active_indel_vcf > "$indel_basename"_HM.vcf
+                perl multi_hits.pl $active_indel_vcf > "$indel_basename"_multihits.vcf
+                perl comp_het_proband.pl --PROBAND=$proband_index "$indel_basename"_multihits.vcf > "$indel_basename"_CH.vcf
+                perl AR.pl --PROBAND=$proband_index $active_indel_vcf > "$indel_basename"_HM.vcf
                 indel_2=1
                 active_indel_vcf="$indel_basename"_CH.vcf
                 indel_vcf_2="$indel_basename"_HM.vcf
@@ -272,12 +272,12 @@ elif [ "$pedigree" == "AR" ]; then
 elif [ "$pedigree" == "DN" ]; then
 
         if [[ $snv_supplied = 1 ]]; then
-                perl $HOME/SOLVE-Brain/DN.pl --PROBAND=$proband_index $active_snv_vcf > "$snv_basename"_DN.vcf
+                perl DN.pl --PROBAND=$proband_index $active_snv_vcf > "$snv_basename"_DN.vcf
                 active_snv_vcf="$snv_basename"_DN.vcf
                 snv_basename=${active_snv_vcf%.*}
         fi
         if [[ $indel_supplied = 1 ]]; then
-                perl $HOME/SOLVE-Brain/DN.pl --PROBAND=$proband_index $active_indel_vcf > "$indel_basename"_DN.vcf
+                perl DN.pl --PROBAND=$proband_index $active_indel_vcf > "$indel_basename"_DN.vcf
                 active_indel_vcf="$indel_basename"_DN.vcf
                 indel_basename=${active_indel_vcf%.*}
         fi
@@ -285,12 +285,12 @@ elif [ "$pedigree" == "DN" ]; then
 elif [ "$pedigree" == "XL" ]; then
 
         if [[ $snv_supplied = 1 ]]; then
-                perl $HOME/SOLVE-Brain/AD_mother.pl --PROBAND=$proband_index $active_snv_vcf | grep -w X > "$snv_basename"_XL.vcf
+                perl AD_mother.pl --PROBAND=$proband_index $active_snv_vcf | grep -w X > "$snv_basename"_XL.vcf
                 active_snv_vcf="$snv_basename"_XL.vcf
                 snv_basename=${active_snv_vcf%.*}
         fi
         if [[ $indel_supplied = 1 ]]; then
-                perl $HOME/SOLVE-Brain/AD_mother.pl --PROBAND=$proband_index $active_indel_vcf | grep -w X > "$indel_basename"_XL.vcf
+                perl AD_mother.pl --PROBAND=$proband_index $active_indel_vcf | grep -w X > "$indel_basename"_XL.vcf
                 active_indel_vcf="$indel_basename"_XL.vcf
                 indel_basename=${active_indel_vcf%.*}
         fi
@@ -298,16 +298,16 @@ fi
 
 #run solve part1 to extract gene names
 if [[ $snv_supplied = 1 ]]; then
-        perl $HOME/SOLVE-Brain/get_genes.pl $active_snv_vcf | uniq | grep -v -w Gene > "$snv_basename"_genes.txt
+        perl get_genes.pl $active_snv_vcf | uniq | grep -v -w Gene > "$snv_basename"_genes.txt
         if [[ $snv_2 = 1 ]]; then
-        perl $HOME/SOLVE-Brain/get_genes.pl $snv_vcf_2 | uniq | grep -v -w Gene > "$snv_basename_2"_genes.txt
+        perl get_genes.pl $snv_vcf_2 | uniq | grep -v -w Gene > "$snv_basename_2"_genes.txt
         fi
 
 fi
 if [[ $indel_supplied = 1 ]]; then
-        perl $HOME/SOLVE-Brain/get_genes.pl $active_indel_vcf | uniq | grep -v -w Gene > "$indel_basename"_genes.txt
+        perl get_genes.pl $active_indel_vcf | uniq | grep -v -w Gene > "$indel_basename"_genes.txt
         if [[ $indel_2 = 1 ]]; then
-                perl $HOME/SOLVE-Brain/get_genes.pl $indel_vcf_2 | uniq | grep -v -w Gene > "$indel_basename_2"_genes.txt
+                perl get_genes.pl $indel_vcf_2 | uniq | grep -v -w Gene > "$indel_basename_2"_genes.txt
         fi
 
 fi
@@ -315,17 +315,17 @@ fi
 #compare to known genes
 if [[ $known_gene_list != 0 ]]; then
         if [[ $snv_supplied = 1 ]]; then
-                perl $HOME/SOLVE-Brain/shared_genes.pl $known_gene_list "$snv_basename"_genes.txt | uniq > "$snv_basename"_known_genes.txt
+                perl shared_genes.pl $known_gene_list "$snv_basename"_genes.txt | uniq > "$snv_basename"_known_genes.txt
 
                 if [[ $snv_2 = 1 ]]; then
-                        perl $HOME/SOLVE-Brain/shared_genes.pl $known_gene_list "$snv_basename_2"_genes.txt | uniq > "$snv_basename_2"_known_genes.txt
+                        perl shared_genes.pl $known_gene_list "$snv_basename_2"_genes.txt | uniq > "$snv_basename_2"_known_genes.txt
 
                 fi
         fi
         if [[ $indel_supplied = 1 ]]; then
-                perl $HOME/SOLVE-Brain/shared_genes.pl $known_gene_list "$indel_basename"_genes.txt | uniq > "$indel_basename"_known_genes.txt
+                perl shared_genes.pl $known_gene_list "$indel_basename"_genes.txt | uniq > "$indel_basename"_known_genes.txt
                 if [[ $indel_2 = 1 ]]; then
-                        perl $HOME/SOLVE-Brain/shared_genes.pl $known_gene_list "$indel_basename_2"_genes.txt | uniq > "$indel_basename_2"_known_genes.txt
+                        perl shared_genes.pl $known_gene_list "$indel_basename_2"_genes.txt | uniq > "$indel_basename_2"_known_genes.txt
 
                 fi
         fi
