@@ -113,7 +113,7 @@ sub output_form {
 # Outputs footer and end html tags
 sub output_end {
         my ($q) = @_;
-        print $q->div("SOLVE^Brain 1.0 (c)2013");
+        print $q->div("SOLVE-Brain 1.0.1 Paciorkowski Lab (c)2013");
         print $q->end_html;
 }
 
