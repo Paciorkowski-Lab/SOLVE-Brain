@@ -66,7 +66,7 @@ sub output_top {
                         },
                 );
                 print "<img src='/images/SOLVE_brain_logo.jpg' />";
-                print $q->h2("Gene Annotation"));
+                print $q->h2("Gene Annotation");
         }
 
 # Outputs footer and end html tags
@@ -107,7 +107,7 @@ sub output_form {
 
         print $q->start_table;
         print $q->Tr(
-                        print $q->h2("Gene Annotation");
+                        print $q->h2("Gene Annotation"));
         }
 
 # Outputs footer and end html tags
