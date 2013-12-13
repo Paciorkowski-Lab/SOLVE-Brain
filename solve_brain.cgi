@@ -58,6 +58,81 @@ sub output_top {
                                         vertical-align: top;
                                         }
                                 td {
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+sub output_form {
+        my ($q) = @_;
+        my @genelist;
+        print $q->start_form(
+                -name => 'genelist',
+                -method => 'POST',
+        );
+        print $q->start_table;
+        print $q->Tr(
+                        print $q->h2("Gene Annotation"));
+        }
+# Outputs footer and end html tags
+sub output_end {
+        my ($q) = @_;
+        print $q->div("SOLVE-Brain 1.0.1 Paciorkowski Lab (c)2013");
+        print $q->end_html;
+}
+# Displays results
+sub display_results {
+        my $genelist = $q->param('genes');
+        my @genes = split (/\s+/,$genelist);
+        foreach my $gene(@genes) {
+                print "<tr><td>$gene</td>
+               <td><a href='http://www.brain-map.org/search/index.html?query=$gene&fa=false&e_sp=t&e_ag=t&e_tr=t' target='_blank'><img src='/images/aibs.png' width=75px /></a></td>
+               <td><a href='http://www.ncbi.nlm.nih.gov/pubmed/?term=$gene AND brain' target='_blank'><img src='/images/PubMed.png' /></a></td>
+               <td><a href='http://lynx.ci.uchicago.edu/gene/?geneid=$gene' target='_blank'><img src='/images/lynx.png' width=75px /></a></td>
+               <td><a href='http://www.informatics.jax.org/searchtool/Search.do?query=$gene&submit=Quick+Search' target='_blank'><img src='/images/mgi.png' width=75px /></a></td>
+               <td><a href='http://genome.ucsc.edu/cgi-bin/hgTracks?org=human&db=hg19&singleSearch=knownCanonical&position=$gene' target='_blank'><img src='/images/UCSC.png' width=75px /></a></td></tr><br /><br />";
+        }
+        print "<br />";
+}
+# Outputs form
+sub output_form {
+        my ($q) = @_;
+
                                         padding: 2pt;
                                         vertical-align: top;
                                         }
@@ -74,26 +149,6 @@ sub output_end {
         my ($q) = @_;
         print $q->div("SOLVE-Brain 1.0.1 Paciorkowski Lab (c)2013");
         print $q->end_html;
-}
-
-# Displays results
-sub display_results {
-        my $genelist = $q->param('genes');
-        my @genes = split (/\s+/,$genelist);
-        foreach my $gene(@genes) {
-                print "<tr><td>$gene</td>
-               <td><a href='http://www.brain-map.org/search/index.html?query=$gene&fa=false&e_sp=t&e_ag=t&e_tr=t' target='_blank'><img sr
-c='/images/aibs.png' width=75px /></a></td>
-               <td><a href='http://www.ncbi.nlm.nih.gov/pubmed/?term=$gene AND brain' target='_blank'><img src='/images/PubMed.png' /></a
-></td>
-               <td><a href='http://lynx.ci.uchicago.edu/gene/?geneid=$gene' target='_blank'><img src='/images/lynx.png' width=75px /></a>
-</td>
-               <td><a href='http://www.informatics.jax.org/searchtool/Search.do?query=$gene&submit=Quick+Search' target='_blank'><img src
-='/images/mgi.png' width=75px /></a></td>
-               <td><a href='http://genome.ucsc.edu/cgi-bin/hgTracks?org=human&db=hg19&singleSearch=knownCanonical&position=$gene' target=
-'_blank'><img src='/images/UCSC.png' width=75px /></a></td></tr>       <br /><br />";
-        }
-        print "<br />";
 }
 
 # Outputs form
@@ -123,12 +178,9 @@ sub display_results {
         my @genes = split (/\s+/,$genelist);
         foreach my $gene(@genes) {
                 print "<tr><td>$gene</td>
-               <td><a href='http://www.brain-map.org/search/index.html?query=$gene&fa=false&e_sp=t&e_ag=t&e_tr=t' target='_blank'><img sr
-c='/images/aibs.png' width=75px /></a></td>
-               <td><a href='http://www.ncbi.nlm.nih.gov/pubmed/?term=$gene AND brain' target='_blank'><img src='/images/PubMed.png' /></a
-></td>
-               <td><a href='http://lynx.ci.uchicago.edu/gene/?geneid=$gene' target='_blank'><img src='/images/lynx.png' width=75px /></a>
-</td>
+               <td><a href='http://www.brain-map.org/search/index.html?query=$gene&fa=false&e_sp=t&e_ag=t&e_tr=t' target='_blank'><img src='/images/aibs.png' width=75px /></a></td>
+               <td><a href='http://www.ncbi.nlm.nih.gov/pubmed/?term=$gene AND brain' target='_blank'><img src='/images/PubMed.png' /></a></td>
+               <td><a href='http://lynx.ci.uchicago.edu/gene/?geneid=$gene' target='_blank'><img src='/images/lynx.png' width=75px /></a></td>
                <td><a href='http://www.informatics.jax.org/searchtool/Search.do?query=$gene&submit=Quick+Search' target='_blank'><img src
 ='/images/mgi.png' width=75px /></a></td>
                <td><a href='http://genome.ucsc.edu/cgi-bin/hgTracks?org=human&db=hg19&singleSearch=knownCanonical&position=$gene' target=
