@@ -82,11 +82,26 @@ sub display_results {
         my @genes = split (/\s+/,$genelist);
         foreach my $gene(@genes) {
                 print "<tr><td>$gene</td>
-               <td><a href='http://www.brain-map.org/search/index.html?query=$gene&fa=false&e_sp=t&e_ag=t&e_tr=t' target='_blank'><img src='/images/aibs.png' width=75px /></a></td>
-               <td><a href='http://www.ncbi.nlm.nih.gov/pubmed/?term=$gene AND brain' target='_blank'><img src='/images/PubMed.png' /></a></td>
-               <td><a href='http://lynx.ci.uchicago.edu/gene/?geneid=$gene' target='_blank'><img src='/images/lynx.png' width=75px /></a></td>
-               <td><a href='http://www.informatics.jax.org/searchtool/Search.do?query=$gene&submit=Quick+Search' target='_blank'><img src='/images/mgi.png' width=75px /></a></td>
-               <td><a href='http://genome.ucsc.edu/cgi-bin/hgTracks?org=human&db=hg19&singleSearch=knownCanonical&position=$gene' target='_blank'><img src='/images/UCSC.png' width=75px /></a></td></tr><br /><br />";
+               <td>
+                        <a href='http://www.brain-map.org/search/index.html?query=$gene&fa=false&e_sp=t&e_ag=t&e_tr=t' target='_blank'>
+                        <img src='/images/aibs.png' width=75px /></a>
+               </td>
+               <td>
+                        <a href='http://www.ncbi.nlm.nih.gov/pubmed/?term=$gene AND brain' target='_blank'>
+                        <img src='/images/PubMed.png' /></a>
+               </td>
+               <td>
+                        <a href='http://lynx.ci.uchicago.edu/gene/?geneid=$gene' target='_blank'>
+                        <img src='/images/lynx.png' width=75px /></a>
+               </td>
+               <td>
+                        <a href='http://www.informatics.jax.org/searchtool/Search.do?query=$gene&submit=Quick+Search' target='_blank'>
+                        <img src='/images/mgi.png' width=75px /></a>
+               </td>
+               <td>
+                        <a href='http://genome.ucsc.edu/cgi-bin/hgTracks?org=human&db=hg19&singleSearch=knownCanonical&position=$gene' target='_blank'>
+                        <img src='/images/UCSC.png' width=75px /></a>
+               </td></tr><br /><br />";
         }
         print "<br />";
 }
@@ -131,23 +146,6 @@ sub output_end {
         my ($q) = @_;
         print $q->div("SOLVE-Brain 1.0.1 Paciorkowski Lab (c)2013");
         print $q->end_html;
-}
-
-# Displays results
-sub display_results {
-        my $genelist = $q->param('genes');
-        my @genes = split (/\s+/,$genelist);
-        foreach my $gene(@genes) {
-                print "<tr><td>$gene</td>
-               <td><a href='http://www.brain-map.org/search/index.html?query=$gene&fa=false&e_sp=t&e_ag=t&e_tr=t' target='_blank'><img src='/images/aibs.png' width=75px /></a></td>
-               <td><a href='http://www.ncbi.nlm.nih.gov/pubmed/?term=$gene AND brain' target='_blank'><img src='/images/PubMed.png' /></a></td>
-               <td><a href='http://lynx.ci.uchicago.edu/gene/?geneid=$gene' target='_blank'><img src='/images/lynx.png' width=75px /></a></td>
-               <td><a href='http://www.informatics.jax.org/searchtool/Search.do?query=$gene&submit=Quick+Search' target='_blank'><img src
-='/images/mgi.png' width=75px /></a></td>
-               <td><a href='http://genome.ucsc.edu/cgi-bin/hgTracks?org=human&db=hg19&singleSearch=knownCanonical&position=$gene' target=
-'_blank'><img src='/images/UCSC.png' width=75px /></a></td></tr>       <br /><br />";
-        }
-        print "<br />";
 }
 
 # Outputs form
