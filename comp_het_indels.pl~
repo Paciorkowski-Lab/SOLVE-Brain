@@ -35,7 +35,7 @@ LINE: while ($_=<$F1>){
         if (defined($line[$proband_index])&&($line[$proband_index] =~ m{0/1})&& ($line[$father_index] =~ m{0/1})&&($line[$mother_index] =~ m{0/0})){
 		#handle multiple affecteds
 		$aff_geno_match=1;
-		for($i=1;$i<$NUM_AFFECTED;$i++){
+		for($i=1;i<$NUM_AFFECTED;i++){
 			if ($line[$proband_index+$i]=~m{0/1}){
 				$aff_geno_match++;
 			}
@@ -47,7 +47,7 @@ LINE: while ($_=<$F1>){
         if (defined($line[$proband_index])&&($line[$proband_index] =~ m{0/1})&& ($line[$father_index] =~ m{0/0})&&($line[$mother_index] =~ m{0/1})){
 		#handle multiple affecteds
 		$aff_geno_match=1;
-		for($i=1;$i<$NUM_AFFECTED;$i++){
+		for($i=1;i<$NUM_AFFECTED;i++){
 			if ($line[$proband_index+$i]=~m{0/1}){
 				$aff_geno_match++;
 			}
@@ -69,7 +69,7 @@ LINE: while ($_=<$F2>){
         if (defined($line[1]) && exists($par1_snv{$line[1]})&&($line[$proband_index] =~ m{0/1})&&($line[$father_index] =~m{0/0}) && ($line[$mother_index] =~ m{0/1})){
               	#handle multiple affecteds
 		$aff_geno_match=1;
-		for($i=1;$i<$NUM_AFFECTED;$i++){
+		for($i=1;i<$NUM_AFFECTED;i++){
 			if ($line[$proband_index+$i]=~m{0/1}){
 				$aff_geno_match++;
 			}
@@ -82,7 +82,7 @@ LINE: while ($_=<$F2>){
         if (defined($line[1]) && exists($par2_snv{$line[1]})&&($line[$proband_index] =~ m{0/1})&&($line[$father_index] =~m{0/1}) && ($line[$mother_index] =~ m{0/0})){
                	#handle multiple affecteds
 		$aff_geno_match=1;
-		for($i=1;$i<$NUM_AFFECTED;$i++){
+		for($i=1;i<$NUM_AFFECTED;i++){
 			if ($line[$proband_index+$i]=~m{0/1}){
 				$aff_geno_match++;
 			}
