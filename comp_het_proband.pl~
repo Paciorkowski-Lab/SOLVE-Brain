@@ -36,11 +36,9 @@ LINE: while ($_=<$F>){
         }
         #is this homozygous genotype passed from one parent
         if (defined($line[$proband_index])&&($line[$proband_index] =~ m{0/1})&& ($line[$father_index] =~ m{0/1})&&($line[$mother_index] =~ m{0/0})){
-		#handle multiple affecteds
                 $parent1=1;#variant passed from parent1=TRUE
         }
         if (defined($line[$proband_index])&&($line[$proband_index] =~ m{0/1})&& ($line[$father_index] =~ m{0/0})&&($line[$mother_index] =~ m{0/1})){
-		#handle multiple affecteds
                 $parent2=1;#variant passed from parent2=TRUE
         }       
         
