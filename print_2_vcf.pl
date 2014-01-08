@@ -50,7 +50,7 @@ LINE: while ($_=<$F2>){
 			print join(qq/\t/,@line);
 		}
 	}
-	if (exists($genes_list{$line[1]})&&($line[$proband_index] =~ m{0/1})&&($line[$father_index] =~m{0/0}) && ($line[$mother_index] =~ m{0/1})){
+	elsif (exists($genes_list{$line[1]})&&($line[$proband_index] =~ m{0/1})&&($line[$father_index] =~m{0/0}) && ($line[$mother_index] =~ m{0/1})){
        		#handle multiple affecteds
 		$aff_geno_match=1;
 		for($i=1;$i<$NUM_AFFECTED;$i++){
