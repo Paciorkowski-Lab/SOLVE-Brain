@@ -202,12 +202,12 @@ fi
 if [[ $gq99_filter = 1 ]]; then
 
         if [[ $snv_supplied = 1 ]]; then
-                perl GQ99.pl --NUM_AFFECTED=$num_affected --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_snv_vcf > "$snv_basename"_GQ99.vcf
+                perl GQ99.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_snv_vcf > "$snv_basename"_GQ99.vcf
                 active_snv_vcf="$snv_basename"_GQ99.vcf
                 snv_basename=${active_snv_vcf%.*}
         fi
         if [[ $indel_supplied = 1 ]]; then
-                perl GQ99.pl --NUM_AFFECTED=$num_affected --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_indel_vcf > "$indel_basename"_GQ99.vcf
+                perl GQ99.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_indel_vcf > "$indel_basename"_GQ99.vcf
                 active_indel_vcf="$indel_basename"_GQ99.vcf
                 indel_basename=${active_indel_vcf%.*}
         fi
