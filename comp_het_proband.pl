@@ -13,17 +13,19 @@
 use strict;
 use warnings;
 use Getopt::Long;
-
+my $NUM_AFFECTED=1;
 my $parent1;
 my $parent2;
+my $aff_geno_match;
 my @comp_hets;
 my $gene_nameA="";
 my $proband_index=35; 
-GetOptions ('PROBAND:i'=>\$proband_index);
+GetOptions ('NUM_AFFECTED:i'=>\$NUM_AFFECTED, 'PROBAND:i'=>\$proband_index);
 my $file = shift;
+my $i;
 #print "proband is $proband_index";
-my $father_index=$proband_index+1;
-my $mother_index=$proband_index+2;
+my $father_index=$proband_index+$NUM_AFFECTED;
+my $mother_index=$proband_index+$NUM_AFFECTED+1;
 open my ($F), $file or die $!;
 LINE: while ($_=<$F>){
         my @line = split /\t/;
@@ -35,12 +37,29 @@ LINE: while ($_=<$F>){
         }
         #is this homozygous genotype passed from one parent
         if (defined($line[$proband_index])&&($line[$proband_index] =~ m{0/1})&& ($line[$father_index] =~ m{0/1})&&($line[$mother_index] =~ m{0/0})){
-                $parent1=1;#variant passed from parent1=TRUE
-        }
-        if (defined($line[$proband_index])&&($line[$proband_index] =~ m{0/1})&& ($line[$father_index] =~ m{0/0})&&($line[$mother_index] =~ m{0/1})){
-                $parent2=1;#variant passed from parent2=TRUE
-        }       
+		#handle multiple affecteds
+		$aff_geno_match=1;
+		for($i=1;$i<$NUM_AFFECTED;$i++){
+			if ($line[$proband_index+$i]=~m{0/1}){
+				$aff_geno_match++;
+			}
+		}
+		if ($aff_geno_match == $NUM_AFFECTED){
+			$parent1=1;#variant passed from parent1=TRUE
+		}
+	} elsif (defined($line[$proband_index])&&($line[$proband_index] =~ m{0/1})&& ($line[$father_index] =~ m{0/0})&&($line[$mother_index] =~ m{0/1})){
+		#handle multiple affecteds
+		$aff_geno_match=1;
+		for($i=1;$i<$NUM_AFFECTED;$i++){
+			if ($line[$proband_index+$i]=~m{0/1}){
+				$aff_geno_match++;
+			}
+		}
+		if ($aff_geno_match == $NUM_AFFECTED){
+			$parent2=1;#variant passed from parent2=TRUE
         
+		}       
+	}
         #if this gene is compound het, store gene name
         if (($parent1) && ($parent2)){
                 push @comp_hets, $line[1];
@@ -53,9 +72,18 @@ open my ($F2), $file or die $!;
 my %comp_het = map { $_ => 1} @comp_hets;
 LINE: while ($_=<$F2>){
         my @line = split /\t/;
-        if ((exists($comp_het{$line[1]})) && (($line[$proband_index] =~ m{0/1})&& (($line[$father_index] =~ m{0/0})&&($line[$mother_index] =~ m{0/1}))||(       ($line[$proband_index] =~ m{0/1})&& ($line[$father_index] =~ m{0/1})&&($line[$mother_index] =~ m{0/0})))){
-print join(qq/\t/, @line);
-}
+        if ((exists($comp_het{$line[1]})) && (($line[$proband_index] =~ m{0/1})&& (($line[$father_index] =~ m{0/0})&&($line[$mother_index] =~ m{0/1}))||(($line[$proband_index] =~ m{0/1})&& ($line[$father_index] =~ m{0/1})&&($line[$mother_index] =~ m{0/0})))){
+		#handle multiple affecteds
+		$aff_geno_match=1;
+		for($i=1;$i<$NUM_AFFECTED;$i++){
+			if ($line[$proband_index+$i]=~m{0/1}){
+				$aff_geno_match++;
+			}
+		}
+		if ($aff_geno_match == $NUM_AFFECTED){
+			print join(qq/\t/, @line);
+		}
+	}
 
 
 }
