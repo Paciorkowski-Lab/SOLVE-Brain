@@ -10,12 +10,15 @@
 
 use strict;
 use warnings;
-
+use Getopt::Long;
+my $GENE_INDEX=1;
+GetOptions ('GENE_INDEX:i'=>\$GENE_INDEX);
 my $file = shift;
+
 open my ( $F ), $file or die $!;
 LINE: while ($_=<$F>) {
     my @line = split /\t/;
-        my @gene_symbol = $line[1];
+        my @gene_symbol = $line[$GENE_INDEX];
 
             my $printme = 0;
                 ++$printme if @gene_symbol;
