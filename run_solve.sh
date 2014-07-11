@@ -233,17 +233,17 @@ fi
 if [[ $remove_dbSNPs = 1 ]]; then
 
         if [[ $snv_supplied = 1 ]]; then
-                less $active_snv_vcf | grep -v rs > "$snv_basename"_nodbSNP.vcf
+                grep -v rs[0-9] $active_snv_vcf > "$snv_basename"_nodbSNP.vcf
                 active_snv_vcf="$snv_basename"_nodbSNP.vcf
                 snv_basename=${active_snv_vcf%.*}
         fi
         if [[ $indel_supplied = 1 ]]; then
-                less $active_indel_vcf | grep -v rs > "$indel_basename"_nodbSNP.vcf
+                grep -v rs[0-9] $active_indel_vcf > "$indel_basename"_nodbSNP.vcf
                 active_indel_vcf="$indel_basename"_nodbSNP.vcf
                 indel_basename=${active_indel_vcf%.*}
         fi
         if [[ $combined_vcf_supplied = 1 ]]; then
-                less $active_combined_vcf | grep -v rs > "$combined_basename"_nodbSNP.vcf
+                grep -v rs[0-9] $active_combined_vcf > "$combined_basename"_nodbSNP.vcf
                 active_combined_vcf="$combined_basename"_nodbSNP.vcf
                 combined_basename=${active_combined_vcf%.*}
         fi
@@ -270,6 +270,10 @@ if [[ $gq99_filter = 1 ]]; then
         fi
 
 fi
+
+intermed_snv_files=$snv_basename
+intermed_indel_files=$indel_basename
+intermed_combo_files=$combined_basename
 
 #filter by pedigree
 if [ "$pedigree" == "AD" ]; then
@@ -326,6 +330,7 @@ elif [ "$pedigree" == "AR" ]; then
                 snv_2=1
                 active_snv_vcf="$snv_basename"_CH.vcf
                 snv_vcf_2="$snv_basename"_HM.vcf
+		rm "$snv_basename"_multihits.vcf
                 snv_basename=${active_snv_vcf%.*}
                 snv_basename_2=${snv_vcf_2%.*}
 
@@ -339,6 +344,7 @@ elif [ "$pedigree" == "AR" ]; then
                 indel_2=1
                 active_indel_vcf="$indel_basename"_CH.vcf
                 indel_vcf_2="$indel_basename"_HM.vcf
+		rm "$indel_basename"_multihits.vcf
                 indel_basename=${active_indel_vcf%.*}
                 indel_basename_2=${indel_vcf_2%.*}
 
@@ -351,6 +357,7 @@ elif [ "$pedigree" == "AR" ]; then
                 combined_2=1
                 active_combined_vcf="$combined_basename"_CH.vcf
                 combined_vcf_2="$combined_basename"_HM.vcf
+		rm "$combined_basename"_multihits.vcf
                 combined_basename=${active_combined_vcf%.*}
                 combined_basename_2=${combined_vcf_2%.*}
 
@@ -446,6 +453,23 @@ if [[ $known_gene_list != 0 ]]; then
 
 fi
 if [[ $remove_files = 1 ]]; then
-	#rm *.
-	echo "remove files"	
+	#remove intermediate files
+	rm -f "removing intermediate files"
+	rm -f $intermed_snv_files.vcf
+	rm -f ${intermed_snv_files%_GQ99}.vcf
+	rm -f ${intermed_snv_files%_nodbSNP}.vcf
+	
+	rm -f $intermed_indel_files.vcf
+	rm -f ${intermed_indel_files%_GQ99}.vcf
+	rm -f ${intermed_indel_files%_nodbSNP}.vcf
+
+	rm -f $intermed_combo_files.vcf
+	rm -f ${intermed_combo_files%_GQ99}.vcf
+	rm -f ${intermed_combo_files%_nodbSNP}.vcf
+
+
+	#combined vcf with both nonframe and nonsynon removed has one more removal step...
+	if [[ $combined_vcf_supplied = 1 && $remove_nonframe = 1 && $remove_nonsynon = 1 ]]; then
+		rm -f ${intermed_combo_files%_no_nonframeshift}.vcf
+	fi
 fi
