@@ -41,11 +41,11 @@ combined_basename_2=0
 output_indicated=0
 ouput_base=0
 num_affected=1
-remove_files=0
+retain_int_files=0
 gene_index_supplied=0
 gene_index=1
 
-usage="usage:\nsh run_solve.sh [required_arguments] [optional_arguments]\n\nrequired:\n-P <pedigree> . Indicates the pedigree hypothesis. The following are valid options: AD, AR, DN, XL\n\tAD  = Autosomal Dominant inherited from either the father or the mother.\n\tAR  = Autosomal Recessive. Will filter for recessive SNVs and INDELs (if supplied by user)\n\tDN  = De novo. Will filter for De novo variants found only in the proband and not in the parents.\n\tXL  = X-linked. Will filter for x linked variants.\n\tnone = In the case that a user would like to simply filter vcfs to remove members of dbSNP, low quality, synonymous, or nonframeshift variants (or any combination). If this option is selected, -r is forced to be set to false.\n-i <proband index>. Integer representing the index (column) that holds the proband in supplied vcf. In the case of multiple affecteds, the proband index would be the column of the first proband listed in the vcf. Remember: when counting the index, start at 0 not 1!\n\nat least ONE of the following required:\n-S <snv_file> The input SNV vcf file. Must be annotated with gene name in column index [1] and in the following order: proband,[proband2, proband3,...probandn,] father, mother.\n-I <indel_file> The annotated indel vcf file. Must be annotated with gene name in column index [1] and in the following order: proband,[proband2, proband3,...probandn,] father, mother.\n-C <combined_vcf_file> The annotated combined vcf file. Must be annotated with gene name in column index [1] and in the following order: proband,[proband2, proband3,...probandn,] father, mother.\n\noptional:\n-O </path/to/output/output_prefix>. This allows user to specify the path and prefix of output files. If this is not specified, output prefix will be the name of input files.\n-a <number_of_affecteds> This is an integer representing the number of affecteds. The affecteds must be in the rows directly after the proband. This value defaults to 1.\n-k <file> . User-suppled list of known pathogenic genes. Can be dbdb gene list or user generated list.\n-s keep synonymous SNVs. The default is to remove synonymous SNVs\n-n keep nonframeshift INDELs. The default is to remove nonframeshift indels.\n-q quality filter. Keep only high quality reads. Removes all variants in the proband that had a GQ score lower than 99.\n-d Keep variants in dbSNP. The default is to remove these variants.\n-r remove intermediate files.\n-g <gene_name_index> The column index of gene name. Default value is [1]\n"
+usage="usage:\nsh run_solve.sh [required_arguments] [optional_arguments]\n\nrequired:\n-P <pedigree> . Indicates the pedigree hypothesis. The following are valid options: AD, AR, DN, XL\n\tAD  = Autosomal Dominant inherited from either the father or the mother.\n\tAR  = Autosomal Recessive. Will filter for recessive SNVs and INDELs (if supplied by user)\n\tDN  = De novo. Will filter for De novo variants found only in the proband and not in the parents.\n\tXL  = X-linked. Will filter for x linked variants.\n\tnone = In the case that a user would like to simply filter vcfs to remove members of dbSNP, low quality, synonymous, or nonframeshift variants (or any combination). If this option is selected, -r is forced to be set to true.\n-i <proband index>. Integer representing the index (column) that holds the proband in supplied vcf. In the case of multiple affecteds, the proband index would be the column of the first proband listed in the vcf. Remember: when counting the index, start at 0 not 1!\n\nat least ONE of the following required:\n-S <snv_file> The input SNV vcf file. Must be annotated with gene name in column index [1] and in the following order: proband,[proband2, proband3,...probandn,] father, mother.\n-I <indel_file> The annotated indel vcf file. Must be annotated with gene name in column index [1] and in the following order: proband,[proband2, proband3,...probandn,] father, mother.\n-C <combined_vcf_file> The annotated combined vcf file. Must be annotated with gene name in column index [1] and in the following order: proband,[proband2, proband3,...probandn,] father, mother.\n\noptional:\n-O </path/to/output/output_prefix>. This allows user to specify the path and prefix of output files. If this is not specified, output prefix will be the name of input files.\n-a <number_of_affecteds> This is an integer representing the number of affecteds. The affecteds must be in the rows directly after the proband. This value defaults to 1.\n-k <file> . User-suppled list of known pathogenic genes. Can be dbdb gene list or user generated list.\n-s keep synonymous SNVs. The default is to remove synonymous SNVs\n-n keep nonframeshift INDELs. The default is to remove nonframeshift indels.\n-q quality filter. Keep only high quality reads. Removes all variants in the proband that had a GQ score lower than 99.\n-d Keep variants in dbSNP. The default is to remove these variants.\n-r remove intermediate files.\n-g <gene_name_index> The column index of gene name. Default value is [1]\n"
 
 
 #process command line arguments
@@ -55,7 +55,7 @@ usage="usage:\nsh run_solve.sh [required_arguments] [optional_arguments]\n\nrequ
 #       AR  = Autosomal Recessive. Will filter for recessive SNVs and INDELs (if supplied by user). Will filter for compound heterosyzous SNVs and also in INDEL file if supplied by the user.
 #       DN  = De novo. Will filter for De novo variants found only in the proband and not in the parents.
 #       XL  = X-linked. Will filter for X-linked variants (for male probands).
-#	none = In the case that a user would like to simply filter vcfs to remove members of dbSNP, low quality, synonymous, or nonframeshift variants (or any combination). If this option is selected, -r is forced to be set to false.
+#	none = In the case that a user would like to simply filter vcfs to remove members of dbSNP, low quality, synonymous, or nonframeshift variants (or any combination). If this option is selected, -r is forced to be set to true.
 #-i <proband index>. Integer representing the index (column) that holds the proband in supplied vcf. default value is 35; however, this value can vary depending on how the vcf has been annotated. Remeber: when counting the index, start at 0 not 1! 
 #
 #at least ONE of the following required:
@@ -72,7 +72,7 @@ usage="usage:\nsh run_solve.sh [required_arguments] [optional_arguments]\n\nrequ
 #-n keep nonframeshift INDELs. The default is to remove nonframeshift INDELs
 #-q quality filter. Remove all variants in the proband that had a GQ score lower than 99.
 #-d keep variants in dbSNP. The default is to remove variants found in dbSNP
-#-r remove intermediate files.
+#-r retain intermediate files.
 #-g <gene_name_index> column index in annotated vcf with name of genes. Default value is [1]
 
 echo "Running SOLVE-Brain"
@@ -146,8 +146,8 @@ case $opt in
 		gene_index_supplied=1
 		;;
 	r)
-		echo "-r intermediate files will be removed"
-		remove_files=1
+		echo "-r intermediate files will be retained"
+		retain_int_files=1
 		;;
 
         \?)
@@ -185,8 +185,8 @@ if [[ $snv_supplied = 0 && $indel_supplied = 0 && $combined_vcf_supplied = 0 ]];
 fi
 
 #if user selected -P none and -r, alert user that -r will be forced to false
-if [[ "$pedigree" = "none" ]]; then
-	printf "Pedigree -P set to \"none\" requires user to keep intermediate files. -r will be set to false.\n"
+if [[ "$pedigree" = "none" && $retain_int_files = 0 ]]; then
+	printf "Pedigree -P set to \"none\" requires user to keep intermediate files. -r will be set to true.\n"
 fi
 
 
@@ -462,7 +462,7 @@ if [[ $known_gene_list != 0 ]]; then
 
 fi
 
-if [[ $remove_files = 1 ]]; then
+if [[ $retain_int_files = 0 ]]; then
 	#remove intermediate files
 #	echo hey
 	
