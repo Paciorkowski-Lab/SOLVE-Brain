@@ -1,11 +1,11 @@
 #!/usr/bin/perl
 #
-#08/22/2013 - allow user to enter proband index, default is still 35
-#06/12/2013
+#AR.pl
+#10/25/2013
 #
-#DN.pl <annotated_vcf.vcf>
-#filters annotated vcf for de novo variants.
-#usage: perl DN.pl [options] <vcf_file>
+#AR.pl <annotated_vcf.vcf>
+#filters annotated vcf for homozygous autosomal recessive variants.
+#usage: perl AR.pl [options] <vcf_file>
 #options:       --PROBAND=<proband_index>. Defaults to 35
 #               --NUM_AFFECTED=<number_of_affecteds>. Defaults to 1.
 #Dalia Ghoneim
@@ -26,11 +26,11 @@ open my ($F), $file or die $!;
 #filter for denovo variant
 LINE: while ($_=<$F>){
         my @line = split /\t/;
-        if (defined($line[$proband_index])&&(($line[$proband_index] =~ m{0/1})&&($line[$father_index] =~ m{0/0})&&($line[$mother_index] =~ m{0/0}))){
-                #handle multiple affected
+        if (defined($line[$proband_index])&&(($line[$proband_index] =~ m{1/1})&&($line[$father_index] =~ m{0/1})&&($line[$mother_index] =~ m{0/1}))){
+                #handle multiple affecteds
                 $aff_geno_match=1;
                 for($i=1;$i<$NUM_AFFECTED;$i++){
-                        if ($line[$proband_index+$i]=~m{0/1}){
+                        if ($line[$proband_index+$i]=~m{1/1}){
                                 $aff_geno_match++;
                         }
                 }
@@ -40,4 +40,3 @@ LINE: while ($_=<$F>){
 }
 }
 close $F;
-
