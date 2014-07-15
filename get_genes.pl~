@@ -1,8 +1,10 @@
 #!/usr/bin/perl
 #
 # get_genes.pl
-# extract gene symbols from annotated vcf
-# usage: perl get_genes.pl --GENE_INDEX=<gene_index> <annotated_vcf>
+#
+# It takes a vcf annotated by Annovar
+# and extracts the gene symbols
+#
 # Written 9 Mar 2013
 # Alex Paciorkowski, Dalia Ghoneim
 

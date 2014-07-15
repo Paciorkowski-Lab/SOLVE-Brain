@@ -2,8 +2,8 @@
 #
 #print_2_vcf.pl
 #10/25/2013 
-#takes a list of genes and a vcf. Prints out lines in the vcf that match the genes in the list and that have the indicated genotype.
-#in this case, the pedigree is CH
+#Print out lines in vcf file that match the gene symbols in a list. This version also filters for specific genotype.
+#in this case, the pedigree is compound heterozygous
 #to run: perl print_2_vcf.pl <gene_list> <snv_annotated_with_annovar>.vcf
 #
 #Dalia Ghoneim
@@ -37,7 +37,6 @@ my %genes_list = map { $_ => 1 } @gene_list;
 
 LINE: while ($_=<$F2>){
         my @line = split /\t/;
-#	$aff_geno_match=0;
         if (exists($genes_list{$line[1]})&&($line[$proband_index] =~ m{0/1})&&($line[$father_index] =~m{0/1}) && ($line[$mother_index] =~ m{0/0})){
 		#handle multiple affecteds
 		$aff_geno_match=1;

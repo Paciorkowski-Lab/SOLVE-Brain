@@ -13,6 +13,10 @@
 use strict;
 use warnings;
 use Getopt::Long;
+#options
+#my $verbose=0;
+#my $SSeq=0;
+#my $PED;
 my $NUM_AFFECTED=1;
 my $proband_index=35;
 my $aff_geno_match;

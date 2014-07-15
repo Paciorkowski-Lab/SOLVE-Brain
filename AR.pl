@@ -4,7 +4,7 @@
 #10/25/2013
 #
 #AR.pl <annotated_vcf.vcf>
-#filters annotated vcf for Autosomal Recessive variants.
+#filters annotated vcf for homozygous autosomal recessive variants.
 #usage: perl AR.pl [options] <vcf_file>
 #options:       --PROBAND=<proband_index>. Defaults to 35
 #               --NUM_AFFECTED=<number_of_affecteds>. Defaults to 1.
@@ -13,10 +13,6 @@
 use strict;
 use warnings;
 use Getopt::Long;
-#options
-#my $verbose=0;
-#my $SSeq=0;
-#my $PED;
 my $NUM_AFFECTED=1;
 my $proband_index=35;
 my $aff_geno_match;
@@ -27,11 +23,11 @@ my $i;
 my $father_index=$proband_index+$NUM_AFFECTED;
 my $mother_index=$proband_index+1+$NUM_AFFECTED;
 open my ($F), $file or die $!;
-#filter for denovo variant
+#filter for AR homozygous variants
 LINE: while ($_=<$F>){
         my @line = split /\t/;
         if (defined($line[$proband_index])&&(($line[$proband_index] =~ m{1/1})&&($line[$father_index] =~ m{0/1})&&($line[$mother_index] =~ m{0/1}))){
-                #handle multiple affected
+                #handle multiple affecteds
                 $aff_geno_match=1;
                 for($i=1;$i<$NUM_AFFECTED;$i++){
                         if ($line[$proband_index+$i]=~m{1/1}){

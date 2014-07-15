@@ -197,9 +197,7 @@ active_combined_vcf=$combined_vcf
 snv_basename=${active_snv_vcf%.*}
 indel_basename=${active_indel_vcf%.*}
 combined_basename=${active_combined_vcf%.*}
-original_snv_base=$snv_basename
-original_indel_base=$indel_basename
-original_combined_base=$combined_basename
+
 #set indices
 father_index=$(($proband_index + 1))
 mother_index=$(($proband_index + 2))
@@ -466,17 +464,17 @@ if [[ $remove_files = 1 ]]; then
 	#remove intermediate files
 #	echo hey
 	
-	if [[ $intermed_snv_files != $original_snv_base ]]; then rm -f $intermed_snv_files.vcf; fi
-	if [[ $intermed_indel_files != $original_indel_base ]]; then rm -f $intermed_indel_files.vcf; fi
-	if [[ $intermed_combined_files != $original_combined_base ]]; then rm -f $intermed_combined_files.vcf; fi
+	if [[ $intermed_snv_files != $snv_basename ]]; then rm -f $intermed_snv_files.vcf; fi
+	if [[ $intermed_indel_files != $indel_basename ]]; then rm -f $intermed_indel_files.vcf; fi
+	if [[ $intermed_combined_files != $combined_basename ]]; then rm -f $intermed_combined_files.vcf; fi
 
-	if [[ ${intermed_snv_files%_GQ99} != $original_snv_base ]]; 	then rm -f ${intermed_snv_files%_GQ99}.vcf; fi
-	if [[ ${intermed_indel_files%_GQ99} != $original_indel_base ]]; then rm -f ${intermed_indel_files%_GQ99}.vcf; fi
-	if [[ ${intermed_combined_files%_GQ99} != $original_combined_base ]]; then rm -f ${intermed_combined_files%_GQ99}.vcf; fi
+	if [[ ${intermed_snv_files%_GQ99} != $snv_basename ]]; 	then rm -f ${intermed_snv_files%_GQ99}.vcf; fi
+	if [[ ${intermed_indel_files%_GQ99} != $indel_basename ]]; then rm -f ${intermed_indel_files%_GQ99}.vcf; fi
+	if [[ ${intermed_combined_files%_GQ99} != $combined_basename ]]; then rm -f ${intermed_combined_files%_GQ99}.vcf; fi
 
-	if [[ ${intermed_snv_files%_nodbSNP} != $original_snv_base ]]; then rm -f ${intermed_snv_files%_nodbSNP}.vcf; fi
-	if [[ ${intermed_indel_files%_nodbSNP} != $original_indel_base ]]; then rm -f ${intermed_indel_files%_nodbSNP}.vcf; fi
-	if [[ ${intermed_combined_files%_nodbSNP} != $original_combined_base ]]; then rm -f ${intermed_combined_files%_nodbSNP}.vcf; fi
+	if [[ ${intermed_snv_files%_nodbSNP} != $snv_basename ]]; then rm -f ${intermed_snv_files%_nodbSNP}.vcf; fi
+	if [[ ${intermed_indel_files%_nodbSNP} != $indel_basename ]]; then rm -f ${intermed_indel_files%_nodbSNP}.vcf; fi
+	if [[ ${intermed_combined_files%_nodbSNP} != $combined_basename ]]; then rm -f ${intermed_combined_files%_nodbSNP}.vcf; fi
 
 
 

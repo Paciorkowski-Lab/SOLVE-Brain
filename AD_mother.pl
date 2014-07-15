@@ -6,7 +6,8 @@
 #options:
 #--PROBAND=<proband_index> . Defaults to 35
 #--NUM_AFFECTED=<number_of_affecteds> . Defaults to 1.
-#Filters annotated vcf for Autosomal Dominant variants. User can supply the proband index. Default value is 35. Also can handle multiple affecteds. Default NUM_AFFECTED is 1.
+#Filters annotated vcf for maternall inherited Autosomal Dominant variants. User can supply the proband index. 
+#Default value is 35. Also can handle multiple affecteds. Default NUM_AFFECTED is 1.
 #The order of the input vcf is important. Must follow this order: <proband_1> <proband_n> <father> <mother>
 #Dalia Ghoneim
 #
@@ -23,7 +24,7 @@ my $i;
 my $father_index=$proband_index+$NUM_AFFECTED;
 my $mother_index=$proband_index+1+$NUM_AFFECTED;
 open my ($F), $file or die $!;
-#filter for AD variant
+#filter for maternally inherited AD variants
 LINE: while ($_=<$F>){
         my @line = split /\t/;
         if (defined($line[$proband_index]) && (($line[$proband_index] =~ m{0/1})&&($line[$father_index] =~ m{0/0})&&($line[$mother_index] =~ m{0/1}))){

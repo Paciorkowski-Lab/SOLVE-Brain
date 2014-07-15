@@ -23,7 +23,7 @@ my $file = shift;
 my $i;
 
 #filter user specified for only high quality calls
-open my ($F), $file or die $!;
+open my ($F), $file;
 LINE: while ($_=<$F>){
         my @line = split /\t/;
         if (defined($line[$proband_index])&&($line[$proband_index] =~ m{:99:})){
