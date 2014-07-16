@@ -43,9 +43,11 @@ ouput_base=0
 num_affected=1
 retain_int_files=0
 gene_index_supplied=0
-gene_index=1
+gene_index=0
+header_present=0
+header=0
 
-usage="usage:\nsh run_solve.sh [required_arguments] [optional_arguments]\n\nrequired:\n-P <pedigree> . Indicates the pedigree hypothesis. The following are valid options: AD, AR, DN, XL\n\tAD  = Autosomal Dominant inherited from either the father or the mother.\n\tAR  = Autosomal Recessive. Will filter for recessive SNVs and INDELs (if supplied by user)\n\tDN  = De novo. Will filter for De novo variants found only in the proband and not in the parents.\n\tXL  = X-linked. Will filter for x linked variants.\n\tnone = In the case that a user would like to simply filter vcfs to remove members of dbSNP, low quality, synonymous, or nonframeshift variants (or any combination). If this option is selected, -r is forced to be set to true.\n-i <proband index>. Integer representing the index (column) that holds the proband in supplied vcf. In the case of multiple affecteds, the proband index would be the column of the first proband listed in the vcf. Remember: when counting the index, start at 0 not 1!\n\nat least ONE of the following required:\n-S <snv_file> The input SNV vcf file. Must be annotated with gene name in column index [1] and in the following order: proband,[proband2, proband3,...probandn,] father, mother.\n-I <indel_file> The annotated indel vcf file. Must be annotated with gene name in column index [1] and in the following order: proband,[proband2, proband3,...probandn,] father, mother.\n-C <combined_vcf_file> The annotated combined vcf file. Must be annotated with gene name in column index [1] and in the following order: proband,[proband2, proband3,...probandn,] father, mother.\n\noptional:\n-O </path/to/output/output_prefix>. This allows user to specify the path and prefix of output files. If this is not specified, output prefix will be the name of input files.\n-a <number_of_affecteds> This is an integer representing the number of affecteds. The affecteds must be in the rows directly after the proband. This value defaults to 1.\n-k <file> . User-suppled list of known pathogenic genes. Can be dbdb gene list or user generated list.\n-s keep synonymous SNVs. The default is to remove synonymous SNVs\n-n keep nonframeshift INDELs. The default is to remove nonframeshift indels.\n-q quality filter. Keep only high quality reads. Removes all variants in the proband that had a GQ score lower than 99.\n-d Keep variants in dbSNP. The default is to remove these variants.\n-r remove intermediate files.\n-g <gene_name_index> The column index of gene name. Default value is [1]\n"
+usage="usage:\nsh run_solve.sh [required_arguments] [optional_arguments]\n\nrequired:\n-P <pedigree> . Indicates the pedigree hypothesis. The following are valid options: AD, AR, DN, XL\n\tAD  = Autosomal Dominant inherited from either the father or the mother.\n\tAR  = Autosomal Recessive. Will filter for recessive SNVs and INDELs (if supplied by user)\n\tDN  = De novo. Will filter for De novo variants found only in the proband and not in the parents.\n\tXL  = X-linked. Will filter for x linked variants.\n\tnone = In the case that a user would like to simply filter vcfs to remove members of dbSNP, low quality, synonymous, or nonframeshift variants (or any combination). If this option is selected, -r is forced to be set to true.\n-i <proband index>. Integer representing the index (column) that holds the proband in supplied vcf. In the case of multiple affecteds, the proband index would be the column of the first proband listed in the vcf. Remember: when counting the index, start at 0 not 1!\n\nat least ONE of the following required:\n-S <snv_file> The input SNV vcf file. Must be annotated with gene name in column index [1] and in the following order: proband,[proband2, proband3,...probandn,] father, mother.\n-I <indel_file> The annotated indel vcf file. Must be annotated with gene name in column index [1] and in the following order: proband,[proband2, proband3,...probandn,] father, mother.\n-C <combined_vcf_file> The annotated combined vcf file. Must be annotated with gene name in column index [1] and in the following order: proband,[proband2, proband3,...probandn,] father, mother.\n\noptional:\n-O </path/to/output/output_prefix>. This allows user to specify the path and prefix of output files. If this is not specified, output prefix will be the name of input files.\n-a <number_of_affecteds> This is an integer representing the number of affecteds. The affecteds must be in the rows directly after the proband. This value defaults to 1.\n-k <file> . User-suppled list of known pathogenic genes. Can be dbdb gene list or user generated list.\n-s keep synonymous SNVs. The default is to remove synonymous SNVs\n-n keep nonframeshift INDELs. The default is to remove nonframeshift indels.\n-q quality filter. Keep only high quality reads. Removes all variants in the proband that had a GQ score lower than 99.\n-d Keep variants in dbSNP. The default is to remove these variants.\n-r remove intermediate files.\n-g <gene_name_index> The column index of gene name. This value must be set if input vcf does not have header with gene column labeled Gene or Gene.refGene\n"
 
 
 #process command line arguments
@@ -73,7 +75,7 @@ usage="usage:\nsh run_solve.sh [required_arguments] [optional_arguments]\n\nrequ
 #-q quality filter. Remove all variants in the proband that had a GQ score lower than 99.
 #-d keep variants in dbSNP. The default is to remove variants found in dbSNP
 #-r retain intermediate files.
-#-g <gene_name_index> column index in annotated vcf with name of genes. Default value is [1]
+#-g <gene_name_index> column index in annotated vcf with name of genes. Setting this value is required if input vcf does not contain header with gene column labeled Gene or Gene.refGene.
 
 echo "Running SOLVE-Brain"
 while getopts ":hsnqdra:g:P:i:k:I:S:O:C:" opt; do
@@ -189,6 +191,15 @@ if [[ "$pedigree" = "none" && $retain_int_files = 0 ]]; then
 	printf "Pedigree -P set to \"none\" requires user to keep intermediate files. -r will be set to true.\n"
 fi
 
+#search for gene_column index
+if [[ $combined_vcf_supplied = 1 ]]; then vcf=$combined_vcf
+elif [[ $snv_supplied = 1 ]]; then vcf=$snv_vcf
+elif [[ $indel_supplied = 1 ]]; then vcf=$indel_vcf; fi
+gene_index=$( perl get_gene_column.pl $vcf )
+if [[ $gene_index = "NO_HEADER" ]]; then
+	printf "Error: Could not detect header in supplied vcf. Please rerun using -g to indicate the gene symbol column index.\n"
+	exit 1
+fi
 
 #this represents the vcf that is actively being used in each specific step of the filtration process
 active_snv_vcf=$snv_vcf
