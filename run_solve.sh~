@@ -43,7 +43,7 @@ ouput_base=0
 num_affected=1
 retain_int_files=0
 gene_index_supplied=0
-gene_index=1
+gene_index=0
 header_present=0
 header=0
 
@@ -191,14 +191,16 @@ if [[ "$pedigree" = "none" && $retain_int_files = 0 ]]; then
 	printf "Pedigree -P set to \"none\" requires user to keep intermediate files. -r will be set to true.\n"
 fi
 
+#search for gene_column index
 if [[ $combined_vcf_supplied = 1 ]]; then vcf=$combined_vcf
 elif [[ $snv_supplied = 1 ]]; then vcf=$snv_vcf
 elif [[ $indel_supplied = 1 ]]; then vcf=$indel_vcf; fi
-gene_column=$( perl get_gene_column.pl $vcf )
-if [[ $gene_column = "NO_HEADER" ]]; then
-	printf "Cannot detect header in supplied vcf. Please rerun using -g to indicate the gene symbol column index.\n"
+gene_index=$( perl get_gene_column.pl $vcf )
+if [[ $gene_index = "NO_HEADER" ]]; then
+	printf "Error: Could not detect header in supplied vcf. Please rerun using -g to indicate the gene symbol column index.\n"
 	exit 1
 fi
+
 #this represents the vcf that is actively being used in each specific step of the filtration process
 active_snv_vcf=$snv_vcf
 active_indel_vcf=$indel_vcf
