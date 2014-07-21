@@ -1,4 +1,4 @@
-SOLVE-Brain 1.0.1
+SOLVE-Brain 1.0.3
 ===========
 
 Brain-specific annotation of next-generation sequencing data. 
