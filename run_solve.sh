@@ -189,16 +189,18 @@ if [[ "$pedigree" = "none" && $retain_int_files = 0 ]]; then
 	printf "Pedigree -P set to \"none\" requires user to keep intermediate files. -r will be set to true.\n"
 fi
 
+path_to=${0%run_solve.sh}
 #search for gene_column index
-if [[ $combined_vcf_supplied = 1 ]]; then vcf=$combined_vcf
-elif [[ $snv_supplied = 1 ]]; then vcf=$snv_vcf
-elif [[ $indel_supplied = 1 ]]; then vcf=$indel_vcf; fi
-gene_index=$( perl get_gene_column.pl $vcf )
-if [[ $gene_index = "NO_HEADER" ]]; then
-	printf "Error: Could not detect header in supplied vcf. Please rerun using -g to indicate the gene symbol column index.\n"
-	exit 1
+if [[ $gene_index_supplied = 0 ]]; then
+	if [[ $combined_vcf_supplied = 1 ]]; then vcf=$combined_vcf
+	elif [[ $snv_supplied = 1 ]]; then vcf=$snv_vcf
+	elif [[ $indel_supplied = 1 ]]; then vcf=$indel_vcf; fi
+	gene_index=$( perl "$path_to"get_gene_column.pl $vcf )
+	if [[ $gene_index = "NO_HEADER" ]]; then
+		printf "Error: Could not detect header in supplied vcf. Please rerun using -g to indicate the gene symbol column index.\n"
+		exit 1
+	fi
 fi
-
 #this represents the vcf that is actively being used in each specific step of the filtration process
 active_snv_vcf=$snv_vcf
 active_indel_vcf=$indel_vcf
@@ -272,17 +274,17 @@ fi
 if [[ $gq99_filter = 1 ]]; then
 
         if [[ $snv_supplied = 1 ]]; then
-                perl GQ99.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_snv_vcf > "$snv_basename"_GQ99.vcf
+                perl "$path_to"GQ99.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_snv_vcf > "$snv_basename"_GQ99.vcf
                 active_snv_vcf="$snv_basename"_GQ99.vcf
                 snv_basename=${active_snv_vcf%.*}
         fi
         if [[ $indel_supplied = 1 ]]; then
-                perl GQ99.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_indel_vcf > "$indel_basename"_GQ99.vcf
+                perl "$path_to"GQ99.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_indel_vcf > "$indel_basename"_GQ99.vcf
                 active_indel_vcf="$indel_basename"_GQ99.vcf
                 indel_basename=${active_indel_vcf%.*}
         fi
         if [[ $combined_vcf_supplied = 1 ]]; then
-                perl GQ99.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_combined_vcf > "$combined_basename"_GQ99.vcf
+                perl "$path_to"GQ99.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_combined_vcf > "$combined_basename"_GQ99.vcf
                 active_combined_vcf="$combined_basename"_GQ99.vcf
                 combined_basename=${active_combined_vcf%.*}
         fi
@@ -297,8 +299,8 @@ intermed_combined_files=$combined_basename
 if [ "$pedigree" == "AD" ]; then
 
         if [[ $snv_supplied = 1 ]]; then
-                perl AD_father.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_snv_vcf > "$snv_basename"_AD_father.vcf
-                perl AD_mother.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_snv_vcf > "$snv_basename"_AD_mother.vcf
+                perl "$path_to"AD_father.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_snv_vcf > "$snv_basename"_AD_father.vcf
+                perl "$path_to"AD_mother.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_snv_vcf > "$snv_basename"_AD_mother.vcf
                 snv_2=1
                 active_snv_vcf="$snv_basename"_AD_father.vcf
                 snv_vcf_2="$snv_basename"_AD_mother.vcf
@@ -306,8 +308,8 @@ if [ "$pedigree" == "AD" ]; then
                 snv_basename_2=${snv_vcf_2%.*}
         fi
         if [[ $indel_supplied = 1 ]]; then
-                perl AD_father.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_indel_vcf > "$indel_basename"_AD_father.vcf
-                perl AD_mother.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_indel_vcf > "$indel_basename"_AD_mother.vcf
+                perl "$path_to"AD_father.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_indel_vcf > "$indel_basename"_AD_father.vcf
+                perl "$path_to"AD_mother.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_indel_vcf > "$indel_basename"_AD_mother.vcf
                 indel_2=1
                 active_indel_vcf="$indel_basename"_AD_father.vcf
                 indel_vcf_2="$indel_basename"_AD_mother.vcf
@@ -316,8 +318,8 @@ if [ "$pedigree" == "AD" ]; then
 
         fi
         if [[ $combined_vcf_supplied = 1 ]]; then
-                perl AD_father.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_combined_vcf > "$combined_basename"_AD_father.vcf
-                perl AD_mother.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_combined_vcf > "$combined_basename"_AD_mother.vcf
+                perl "$path_to"AD_father.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_combined_vcf > "$combined_basename"_AD_father.vcf
+                perl "$path_to"AD_mother.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_combined_vcf > "$combined_basename"_AD_mother.vcf
                 combined_2=1
                 active_combined_vcf="$combined_basename"_AD_father.vcf
                 combined_vcf_2="$combined_basename"_AD_mother.vcf
@@ -330,21 +332,21 @@ elif [ "$pedigree" == "AR" ]; then
 
         #SNV+INDEL compound hets
         if [[ $snv_supplied = 1 && $indel_supplied = 1 ]]; then
-                perl comp_het_indels.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_snv_vcf $active_indel_vcf > "$snv_basename"_indels_CH_genes.txt
+                perl "$path_to"comp_het_indels.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_snv_vcf $active_indel_vcf > "$snv_basename"_indels_CH_genes.txt
                 active_snv_indel_list="$snv_basename"_indels_CH_genes.txt
-                perl print_2_vcf.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index "$snv_basename"_indels_CH_genes.txt $active_snv_vcf > "$snv_basename"_indels_CH.vcf
-                perl print_2_vcf.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index "$snv_basename"_indels_CH_genes.txt $active_indel_vcf >> "$snv_basename"_indels_CH.vcf
+                perl "$path_to"print_2_vcf.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index "$snv_basename"_indels_CH_genes.txt $active_snv_vcf > "$snv_basename"_indels_CH.vcf
+                perl "$path_to"print_2_vcf.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index "$snv_basename"_indels_CH_genes.txt $active_indel_vcf >> "$snv_basename"_indels_CH.vcf
 
                 if [[ $known_gene_list != 0 ]]; then
-                perl shared_genes.pl $known_gene_list $active_snv_indel_list > "$snv_basename"_indels_CH_known_genes.txt
+                perl "$path_to"shared_genes.pl $known_gene_list $active_snv_indel_list > "$snv_basename"_indels_CH_known_genes.txt
                 fi
         fi
 
         #SNV + SNV compound hets and AR
         if [[ $snv_supplied = 1 ]]; then
-                perl multi_hits.pl $active_snv_vcf > "$snv_basename"_multihits.vcf
-                perl comp_het_proband.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index "$snv_basename"_multihits.vcf > "$snv_basename"_CH.vcf
-                perl AR.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_snv_vcf > "$snv_basename"_HM.vcf
+                perl "$path_to"multi_hits.pl $active_snv_vcf > "$snv_basename"_multihits.vcf
+                perl "$path_to"comp_het_proband.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index "$snv_basename"_multihits.vcf > "$snv_basename"_CH.vcf
+                perl "$path_to"AR.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_snv_vcf > "$snv_basename"_HM.vcf
                 snv_2=1
                 active_snv_vcf="$snv_basename"_CH.vcf
                 snv_vcf_2="$snv_basename"_HM.vcf
@@ -356,9 +358,9 @@ elif [ "$pedigree" == "AR" ]; then
 
         #INDEL + INDEL compound hets and AR
         if [[ $indel_supplied = 1 ]]; then
-                perl multi_hits.pl $active_indel_vcf > "$indel_basename"_multihits.vcf
-                perl comp_het_proband.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index "$indel_basename"_multihits.vcf > "$indel_basename"_CH.vcf
-                perl AR.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_indel_vcf > "$indel_basename"_HM.vcf
+                perl "$path_to"multi_hits.pl $active_indel_vcf > "$indel_basename"_multihits.vcf
+                perl "$path_to"comp_het_proband.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index "$indel_basename"_multihits.vcf > "$indel_basename"_CH.vcf
+                perl "$path_to"AR.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_indel_vcf > "$indel_basename"_HM.vcf
                 indel_2=1
                 active_indel_vcf="$indel_basename"_CH.vcf
                 indel_vcf_2="$indel_basename"_HM.vcf
@@ -369,9 +371,9 @@ elif [ "$pedigree" == "AR" ]; then
         fi
 	#Combined vcf compound hets and AR
         if [[ $combined_vcf_supplied = 1 ]]; then
-                perl multi_hits.pl $active_combined_vcf > "$combined_basename"_multihits.vcf
-                perl comp_het_proband.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index "$combined_basename"_multihits.vcf > "$combined_basename"_CH.vcf
-                perl AR.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_combined_vcf > "$combined_basename"_HM.vcf
+                perl "$path_to"multi_hits.pl $active_combined_vcf > "$combined_basename"_multihits.vcf
+                perl "$path_to"comp_het_proband.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index "$combined_basename"_multihits.vcf > "$combined_basename"_CH.vcf
+                perl "$path_to"AR.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_combined_vcf > "$combined_basename"_HM.vcf
                 combined_2=1
                 active_combined_vcf="$combined_basename"_CH.vcf
                 combined_vcf_2="$combined_basename"_HM.vcf
@@ -384,17 +386,17 @@ elif [ "$pedigree" == "AR" ]; then
 elif [ "$pedigree" == "DN" ]; then
 
         if [[ $snv_supplied = 1 ]]; then
-                perl DN.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_snv_vcf > "$snv_basename"_DN.vcf
+                perl "$path_to"DN.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_snv_vcf > "$snv_basename"_DN.vcf
                 active_snv_vcf="$snv_basename"_DN.vcf
                 snv_basename=${active_snv_vcf%.*}
         fi
         if [[ $indel_supplied = 1 ]]; then
-                perl DN.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_indel_vcf > "$indel_basename"_DN.vcf
+                perl "$path_to"DN.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_indel_vcf > "$indel_basename"_DN.vcf
                 active_indel_vcf="$indel_basename"_DN.vcf
                 indel_basename=${active_indel_vcf%.*}
         fi
 	if [[ $combined_vcf_supplied = 1 ]]; then
-                perl DN.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_combined_vcf > "$combined_basename"_DN.vcf
+                perl "$path_to"DN.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_combined_vcf > "$combined_basename"_DN.vcf
                 active_combined_vcf="$combined_basename"_DN.vcf
                 combined_basename=${active_combined_vcf%.*}
         fi
@@ -403,17 +405,17 @@ elif [ "$pedigree" == "DN" ]; then
 elif [ "$pedigree" == "XL" ]; then
 
         if [[ $snv_supplied = 1 ]]; then
-                perl AD_mother.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_snv_vcf | grep -w X > "$snv_basename"_XL.vcf
+                perl "$path_to"AD_mother.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_snv_vcf | grep -w X > "$snv_basename"_XL.vcf
                 active_snv_vcf="$snv_basename"_XL.vcf
                 snv_basename=${active_snv_vcf%.*}
         fi
         if [[ $indel_supplied = 1 ]]; then
-                perl AD_mother.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_indel_vcf | grep -w X > "$indel_basename"_XL.vcf
+                perl "$path_to"AD_mother.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_indel_vcf | grep -w X > "$indel_basename"_XL.vcf
                 active_indel_vcf="$indel_basename"_XL.vcf
                 indel_basename=${active_indel_vcf%.*}
         fi
 	if [[ $combined_vcf_supplied = 1 ]]; then
-                perl AD_mother.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_combined_vcf | grep -w X > "$combined_basename"_XL.vcf
+                perl "$path_to"AD_mother.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_combined_vcf | grep -w X > "$combined_basename"_XL.vcf
                 active_combined_vcf="$combined_basename"_XL.vcf
                 combined_basename=${active_combined_vcf%.*}
         fi
@@ -422,23 +424,23 @@ fi
 
 #run solve part1 to extract gene names
 if [[ $snv_supplied = 1 && "$pedigree" != "none" ]]; then
-        perl get_genes.pl --GENE_INDEX=$gene_index $active_snv_vcf | uniq | grep -v -w Gene > "$snv_basename"_genes.txt
+        perl "$path_to"get_genes.pl --GENE_INDEX=$gene_index $active_snv_vcf | uniq | grep -v -w Gene > "$snv_basename"_genes.txt
         if [[ $snv_2 = 1 ]]; then
-        perl get_genes.pl --GENE_INDEX=$gene_index $snv_vcf_2 | uniq | grep -v -w Gene > "$snv_basename_2"_genes.txt
+        perl "$path_to"get_genes.pl --GENE_INDEX=$gene_index $snv_vcf_2 | uniq | grep -v -w Gene > "$snv_basename_2"_genes.txt
         fi
 
 fi
 if [[ $indel_supplied = 1 && "$pedigree" != "none" ]]; then
-        perl get_genes.pl --GENE_INDEX=$gene_index $active_indel_vcf | uniq | grep -v -w Gene > "$indel_basename"_genes.txt
+        perl "$path_to"get_genes.pl --GENE_INDEX=$gene_index $active_indel_vcf | uniq | grep -v -w Gene > "$indel_basename"_genes.txt
         if [[ $indel_2 = 1 ]]; then
-                perl get_genes.pl --GENE_INDEX=$gene_index $indel_vcf_2 | uniq | grep -v -w Gene > "$indel_basename_2"_genes.txt
+                perl "$path_to"get_genes.pl --GENE_INDEX=$gene_index $indel_vcf_2 | uniq | grep -v -w Gene > "$indel_basename_2"_genes.txt
         fi
 
 fi
 if [[ $combined_vcf_supplied = 1 && "$pedigree" != "none" ]]; then
-        perl get_genes.pl --GENE_INDEX=$gene_index $active_combined_vcf | uniq | grep -v -w Gene > "$combined_basename"_genes.txt
+        perl "$path_to"get_genes.pl --GENE_INDEX=$gene_index $active_combined_vcf | uniq | grep -v -w Gene > "$combined_basename"_genes.txt
         if [[ $combined_2 = 1 ]]; then
-                perl get_genes.pl --GENE_INDEX=$gene_index $combined_vcf_2 | uniq | grep -v -w Gene > "$combined_basename_2"_genes.txt
+                perl "$path_to"get_genes.pl --GENE_INDEX=$gene_index $combined_vcf_2 | uniq | grep -v -w Gene > "$combined_basename_2"_genes.txt
         fi
 
 fi
@@ -446,24 +448,24 @@ fi
 #compare to known genes
 if [[ $known_gene_list != 0 ]]; then
         if [[ $snv_supplied = 1 ]]; then
-                perl shared_genes.pl $known_gene_list "$snv_basename"_genes.txt | uniq > "$snv_basename"_known_genes.txt
+                perl "$path_to"shared_genes.pl $known_gene_list "$snv_basename"_genes.txt | uniq > "$snv_basename"_known_genes.txt
 
                 if [[ $snv_2 = 1 ]]; then
-                        perl shared_genes.pl $known_gene_list "$snv_basename_2"_genes.txt | uniq > "$snv_basename_2"_known_genes.txt
+                        perl "$path_to"shared_genes.pl $known_gene_list "$snv_basename_2"_genes.txt | uniq > "$snv_basename_2"_known_genes.txt
 
                 fi
         fi
         if [[ $indel_supplied = 1 ]]; then
-                perl shared_genes.pl $known_gene_list "$indel_basename"_genes.txt | uniq > "$indel_basename"_known_genes.txt
+                perl "$path_to"shared_genes.pl $known_gene_list "$indel_basename"_genes.txt | uniq > "$indel_basename"_known_genes.txt
                 if [[ $indel_2 = 1 ]]; then
-                        perl shared_genes.pl $known_gene_list "$indel_basename_2"_genes.txt | uniq > "$indel_basename_2"_known_genes.txt
+                        perl "$path_to"shared_genes.pl $known_gene_list "$indel_basename_2"_genes.txt | uniq > "$indel_basename_2"_known_genes.txt
 
                 fi
         fi
         if [[ $combined_vcf_supplied = 1 ]]; then
-                perl shared_genes.pl $known_gene_list "$combined_basename"_genes.txt | uniq > "$combined_basename"_known_genes.txt
+                perl "$path_to"shared_genes.pl $known_gene_list "$combined_basename"_genes.txt | uniq > "$combined_basename"_known_genes.txt
                 if [[ $combined_2 = 1 ]]; then
-                        perl shared_genes.pl $known_gene_list "$combined_basename_2"_genes.txt | uniq > "$combined_basename_2"_known_genes.txt
+                        perl "$path_to"shared_genes.pl $known_gene_list "$combined_basename_2"_genes.txt | uniq > "$combined_basename_2"_known_genes.txt
 
                 fi
         fi
@@ -473,7 +475,6 @@ fi
 
 if [[ $retain_int_files = 0 ]]; then
 	#remove intermediate files
-#	echo hey
 	
 	if [[ $intermed_snv_files != $original_snv_base ]]; then rm -f $intermed_snv_files.vcf; fi
 	if [[ $intermed_indel_files != $original_indel_base ]]; then rm -f $intermed_indel_files.vcf; fi
@@ -486,18 +487,6 @@ if [[ $retain_int_files = 0 ]]; then
 	if [[ ${intermed_snv_files%_nodbSNP} != $original_snv_base ]]; then rm -f ${intermed_snv_files%_nodbSNP}.vcf; fi
 	if [[ ${intermed_indel_files%_nodbSNP} != $original_indel_base ]]; then rm -f ${intermed_indel_files%_nodbSNP}.vcf; fi
 	if [[ ${intermed_combined_files%_nodbSNP} != $original_combined_base ]]; then rm -f ${intermed_combined_files%_nodbSNP}.vcf; fi
-
-
-
-
-#rm -f ${intermed_snv_files%_GQ99}.vcf
-#rm -f ${intermed_indel_files%_GQ99}.vcf
-#rm -f ${intermed_combo_files%_GQ99}.vcf
-#
-#rm -f ${intermed_snv_files%_nodbSNP}.vcf
-#rm -f ${intermed_indel_files%_nodbSNP}.vcf
-#rm -f ${intermed_combo_files%_nodbSNP}.vcf
-
 
 	#combined vcf with both nonframe and nonsynon removed has one more removal step...
 	if [[ $combined_vcf_supplied = 1 && $remove_nonframe = 1 && $remove_nonsynon = 1 ]]; then
