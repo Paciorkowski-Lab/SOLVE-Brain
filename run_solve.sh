@@ -446,7 +446,7 @@ if [[ $combined_vcf_supplied = 1 && "$pedigree" != "none" ]]; then
 fi
 
 #compare to known genes
-if [[ $known_gene_list != 0 ]]; then
+if [[ $known_gene_list != 0 && "pedigree" != "none" ]]; then
         if [[ $snv_supplied = 1 ]]; then
                 perl "$path_to"shared_genes.pl $known_gene_list "$snv_basename"_genes.txt | uniq > "$snv_basename"_known_genes.txt
 
