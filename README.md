@@ -3,7 +3,7 @@ SOLVE-Brain 1.0.3
 
 Brain-specific annotation of next-generation sequencing data. 
 
-Release date 2 Nov 2013
+Release date 21 July 2014
 
 Authors: Dalia Ghoneim, Alex Paciorkowski
 
