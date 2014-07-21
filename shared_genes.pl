@@ -31,4 +31,3 @@ LINE: while (my $line =<$F2>){
 
 }       
 close $F2;
-#print STDERR "Done.\n";
