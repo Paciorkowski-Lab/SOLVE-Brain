@@ -25,7 +25,8 @@ my $mother_index=$proband_index+1+$NUM_AFFECTED;
 open my ($F), $file or die $!;
 #filter for denovo variant
 LINE: while ($_=<$F>){
-        my @line = split /\t/;
+	if ($_ =~ m{Gene}){ print $_; }
+	my @line = split /\t/;
         if (defined($line[$proband_index])&&(($line[$proband_index] =~ m{0/1})&&($line[$father_index] =~ m{0/0})&&($line[$mother_index] =~ m{0/0}))){
                 #handle multiple affected
                 $aff_geno_match=1;

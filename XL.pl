@@ -25,18 +25,22 @@ my $mother_index=$proband_index+1+$NUM_AFFECTED;
 open my ($F), $file;
 #filter for XL variant
 LINE: while ($_=<$F>){
-        my @line = split /\t/;
-        if ((($line[$proband_index] =~ m{0/1})&&($line[$father_index] =~ m{0/0})&&($line[$mother_index] =~ m{0/1})&&($line[26] =~ m{X}))||($line[1] =~ m{^Gene})){
-                #handle multiple affected
-                $aff_geno_match=1;
-                for($i=1;$i<$NUM_AFFECTED;$i++){
-                        if ($line[$proband_index+$i]=~m{0/1}){
-                                $aff_geno_match++;
-                        }
-                }
-                if ($aff_geno_match == $NUM_AFFECTED){
-                        print join(qq/\t/, @line);
-                }
-}
+	#my @line;
+	if ($_ =~ m{Gene} ) { print $_; }
+	if ($_ =~ m{\tX\t}){
+	       		my @line = split /\t/;
+        	if ((($line[$proband_index] =~ m{0/1})&&($line[$father_index] =~ m{0/0})&&($line[$mother_index] =~ m{0/1}))){
+                	#handle multiple affected
+                	$aff_geno_match=1;
+                	for($i=1;$i<$NUM_AFFECTED;$i++){
+                        	if ($line[$proband_index+$i]=~m{0/1}){
+                                	$aff_geno_match++;
+                        	}
+                	}
+                	if ($aff_geno_match == $NUM_AFFECTED){
+		   		print join(qq/\t/, @line);
+                	}
+		}
+	}
 }
 close $F;
