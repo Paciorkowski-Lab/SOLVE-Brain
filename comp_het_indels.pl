@@ -15,7 +15,8 @@ use Getopt::Long;
 my $NUM_AFFECTED=1;
 my $proband_index=35;
 my $aff_geno_match;
-GetOptions ('NUM_AFFECTED:i'=>\$NUM_AFFECTED,'PROBAND:i'=>\$proband_index);
+my $GENE_INDEX=1;
+GetOptions ('NUM_AFFECTED:i'=>\$NUM_AFFECTED,'PROBAND:i'=>\$proband_index,'GENE_INDEX:i'=>\$GENE_INDEX);
 my $file1 = shift;
 my $file2 = shift;
 my $i;
@@ -41,7 +42,7 @@ LINE: while ($_=<$F1>){
 			}
 		}
 		if ($aff_geno_match == $NUM_AFFECTED){
-			push @parent1_snv, $line[1];#variant passed from parent1
+			push @parent1_snv, $line[$GENE_INDEX];#variant passed from parent1
 		}
         }
         if (defined($line[$proband_index])&&($line[$proband_index] =~ m{0/1})&& ($line[$father_index] =~ m{0/0})&&($line[$mother_index] =~ m{0/1})){
@@ -53,7 +54,7 @@ LINE: while ($_=<$F1>){
 			}
 		}
 		if ($aff_geno_match == $NUM_AFFECTED){		
-			push @parent2_snv, $line[1];#variant passed from parent2
+			push @parent2_snv, $line[$GENE_INDEX];#variant passed from parent2
         
 		}       
 	}
@@ -66,7 +67,7 @@ my %par2_snv = map { $_ => 1 } @parent2_snv;
 LINE: while ($_=<$F2>){
         my @line = split /\t/;
         #is this gene variant from parent1 in snvs and parent2 in indels
-        if (defined($line[1]) && exists($par1_snv{$line[1]})&&($line[$proband_index] =~ m{0/1})&&($line[$father_index] =~m{0/0}) && ($line[$mother_index] =~ m{0/1})){
+        if (defined($line[$GENE_INDEX]) && exists($par1_snv{$line[$GENE_INDEX]})&&($line[$proband_index] =~ m{0/1})&&($line[$father_index] =~m{0/0}) && ($line[$mother_index] =~ m{0/1})){
               	#handle multiple affecteds
 		$aff_geno_match=1;
 		for($i=1;$i<$NUM_AFFECTED;$i++){
@@ -75,11 +76,11 @@ LINE: while ($_=<$F2>){
 			}
 		}
 		if ($aff_geno_match == $NUM_AFFECTED){
-			push @compound_hets, $line[1];
+			push @compound_hets, $line[$GENE_INDEX];
 		}
         }
         #is this gene variant from parent2 in snvs and parent1 in indels
-        if (defined($line[1]) && exists($par2_snv{$line[1]})&&($line[$proband_index] =~ m{0/1})&&($line[$father_index] =~m{0/1}) && ($line[$mother_index] =~ m{0/0})){
+        if (defined($line[$GENE_INDEX]) && exists($par2_snv{$line[$GENE_INDEX]})&&($line[$proband_index] =~ m{0/1})&&($line[$father_index] =~m{0/1}) && ($line[$mother_index] =~ m{0/0})){
                	#handle multiple affecteds
 		$aff_geno_match=1;
 		for($i=1;$i<$NUM_AFFECTED;$i++){
@@ -88,7 +89,7 @@ LINE: while ($_=<$F2>){
 			}
 		}
 		if ($aff_geno_match == $NUM_AFFECTED){
-		       	push @compound_hets, $line[1];
+		       	push @compound_hets, $line[$GENE_INDEX];
 		}
         }
 }       

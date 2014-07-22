@@ -332,10 +332,10 @@ elif [ "$pedigree" == "AR" ]; then
 
         #SNV+INDEL compound hets
         if [[ $snv_supplied = 1 && $indel_supplied = 1 ]]; then
-                perl "$path_to"comp_het_indels.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_snv_vcf $active_indel_vcf > "$snv_basename"_indels_CH_genes.txt
+                perl "$path_to"comp_het_indels.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index --GENE_INDEX=$gene_index $active_snv_vcf $active_indel_vcf > "$snv_basename"_indels_CH_genes.txt
                 active_snv_indel_list="$snv_basename"_indels_CH_genes.txt
-                perl "$path_to"print_2_vcf.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index "$snv_basename"_indels_CH_genes.txt $active_snv_vcf > "$snv_basename"_indels_CH.vcf
-                perl "$path_to"print_2_vcf.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index "$snv_basename"_indels_CH_genes.txt $active_indel_vcf >> "$snv_basename"_indels_CH.vcf
+                perl "$path_to"print_2_vcf.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index --GENE_INDEX=$gene_index "$snv_basename"_indels_CH_genes.txt $active_snv_vcf > "$snv_basename"_indels_CH.vcf
+                perl "$path_to"print_2_vcf.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index --GENE_INDEX=$gene_index "$snv_basename"_indels_CH_genes.txt $active_indel_vcf >> "$snv_basename"_indels_CH.vcf
 
                 if [[ $known_gene_list != 0 ]]; then
                 perl "$path_to"shared_genes.pl $known_gene_list $active_snv_indel_list > "$snv_basename"_indels_CH_known_genes.txt
@@ -344,8 +344,8 @@ elif [ "$pedigree" == "AR" ]; then
 
         #SNV + SNV compound hets and AR
         if [[ $snv_supplied = 1 ]]; then
-                perl "$path_to"multi_hits.pl $active_snv_vcf > "$snv_basename"_multihits.vcf
-                perl "$path_to"comp_het_proband.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index "$snv_basename"_multihits.vcf > "$snv_basename"_CH.vcf
+                perl "$path_to"multi_hits.pl --GENE_INDEX=$gene_index $active_snv_vcf > "$snv_basename"_multihits.vcf
+                perl "$path_to"comp_het_proband.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index --GENE_INDEX=$gene_index "$snv_basename"_multihits.vcf > "$snv_basename"_CH.vcf
                 perl "$path_to"AR.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_snv_vcf > "$snv_basename"_HM.vcf
                 snv_2=1
                 active_snv_vcf="$snv_basename"_CH.vcf
@@ -358,8 +358,8 @@ elif [ "$pedigree" == "AR" ]; then
 
         #INDEL + INDEL compound hets and AR
         if [[ $indel_supplied = 1 ]]; then
-                perl "$path_to"multi_hits.pl $active_indel_vcf > "$indel_basename"_multihits.vcf
-                perl "$path_to"comp_het_proband.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index "$indel_basename"_multihits.vcf > "$indel_basename"_CH.vcf
+                perl "$path_to"multi_hits.pl --GENE_INDEX=$gene_index $active_indel_vcf > "$indel_basename"_multihits.vcf
+                perl "$path_to"comp_het_proband.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index --GENE_INDEX=$gene_index "$indel_basename"_multihits.vcf > "$indel_basename"_CH.vcf
                 perl "$path_to"AR.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_indel_vcf > "$indel_basename"_HM.vcf
                 indel_2=1
                 active_indel_vcf="$indel_basename"_CH.vcf
@@ -371,8 +371,8 @@ elif [ "$pedigree" == "AR" ]; then
         fi
 	#Combined vcf compound hets and AR
         if [[ $combined_vcf_supplied = 1 ]]; then
-                perl "$path_to"multi_hits.pl $active_combined_vcf > "$combined_basename"_multihits.vcf
-                perl "$path_to"comp_het_proband.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index "$combined_basename"_multihits.vcf > "$combined_basename"_CH.vcf
+                perl "$path_to"multi_hits.pl --GENE_INDEX=$gene_index $active_combined_vcf > "$combined_basename"_multihits.vcf
+                perl "$path_to"comp_het_proband.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index --GENE_INDEX=$gene_index "$combined_basename"_multihits.vcf > "$combined_basename"_CH.vcf
                 perl "$path_to"AR.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_combined_vcf > "$combined_basename"_HM.vcf
                 combined_2=1
                 active_combined_vcf="$combined_basename"_CH.vcf

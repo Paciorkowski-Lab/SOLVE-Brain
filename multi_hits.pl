@@ -8,7 +8,9 @@
 #Dalia Ghoneim
 use strict;
 use warnings;
-
+use Getopt::Long;
+my $GENE_INDEX=1;
+GetOptions ('GENE_INDEX:i'=>\$GENE_INDEX);
 my $file = shift;
 open my ($F), $file or die $!;
 open my ($F2), $file or die $!;
@@ -17,13 +19,13 @@ my @duplicate;
 LINE: while ($_=<$F>){
         my @line = split /\t/;
         # skip line if this is the first time the gene is found
-        if(defined($line[1])&& (! $seen{$line[1]})){
-                $seen{$line[1]}=1;
+        if(defined($line[$GENE_INDEX])&& (! $seen{$line[$GENE_INDEX]})){
+                $seen{$line[$GENE_INDEX]}=1;
                 next;
         }
         #store genes with multiple variants in the array @duplicates
-        if(defined($line[1])){
-                push @duplicate, $line[1]; 
+        if(defined($line[$GENE_INDEX])){
+                push @duplicate, $line[$GENE_INDEX]; 
         }
 }
 close $F;
@@ -35,7 +37,7 @@ my @multihit_lines;
 LINE: while ($_=<$F2>){
         my @line = split /\t/;
         #also preserves header or vcf
-        if (defined($line[1]) && (exists($multihits{$line[1]})||($line[1] =~m{^Gene})) ){
+        if (defined($line[$GENE_INDEX]) && (exists($multihits{$line[$GENE_INDEX]}))){
                 print join(qq/\t/, @line);
 
         }
