@@ -188,6 +188,7 @@ fi
 #if user selected -P none and -r, alert user that -r will be forced to false
 if [[ "$pedigree" = "none" && $retain_int_files = 0 ]]; then
 	printf "Pedigree -P set to \"none\" requires user to keep intermediate files. -r will be set to true.\n"
+	retain_int_files=1
 fi
 
 path_to=${0%run_solve.sh}
