@@ -1,0 +1,88 @@
+/* -- SOLVE-Brain Web Interface Stylesheet -- */
+
+/* -- CSS stylesheet -- */
+
+/* -- HTML and Body information -- */
+html {
+        margin: 0px;
+        padding: 0px;
+        background-color: #e0e0d1;
+
+}
+#body {
+        margin-top: 10px;
+        margin-right: auto;
+        margin-left: auto;
+        padding: 10;
+        width: 950px;
+        font: 12px/18px "Lucida Grande", "Lucida Sans Unicode", sans-serif;
+}
+
+#body a { color: #0068D2; cursor: pointer;
+}
+                 
+#body a:link, a:visited { text-decoration: none; color: #0068D2;
+}
+
+#body a:hover, a:active { text-decoration: underline; color: #0068D2; 
+}
+
+/* -- Content -- */
+
+#content {
+        background-color: #FFF;
+        margin-top: 0;
+        margin-right: auto;
+        margin-left: auto;
+        width: 930px;
+        padding: 10px;
+}
+#content h2 { color: #000099;
+}
+
+#content {
+        font: 12px/18px "Lucida Grande", "Lucida Sans Unicode", sans-serif;
+}
+
+#genes-table { border-collapse: collapse; 
+}
+
+#genes-table, #genes-table th, #genes-table td { padding: 8px 16px; text-align: left; border: 0px solid #B9BABE; 
+}
+
+#genes-table th { font-weight: bold; font-size: 14px; color: #29344B; 
+}
+
+#genes-table td { color: #000; 
+}
+
+#genes-table tr:nth-child(2n) { background: #E8EDFF; 
+}
+
+#genes-form { padding: 10px;
+}
+
+.text input, .button input { padding: 5px; margin: 0; border: 1px solid #ccc; -moz-border-radius: 2px; -webkit-border-radius: 2px; border-radius: 2px; 
+}
+
+#genes-form .item { margin: 3px 0; 
+}
+
+#genes-form label, #genes-form .field { display: inline-block; color: #0C0B07; 
+}
+#genes-form label { width: 110px; font-weight: bold; text-align: right; color: #666; 
+}
+
+#genes-form .text input { width: 176px; padding: 3px; 
+}
+
+#genes-form .button { display: inline-block; 
+}
+
+#genes-form .button-wrapper { padding-left: 113px; 
+}                                                                                                                                       
+.button input { padding: 4px 8px; color: #fff; background-color: #cc0066; background: -moz-linear-gradient(#cc6699, #cc0066); background: -webkit-gradient(linear, 0 0, 0 100%, from(#cc99cc), to(#cc0066)); 
+}
+
+.button-default input { font-weight: bold; color: #fff; background-color: #006600; background: -moz-linear-gradient(#00ff33, #006600); background: -webkit-gradient(linear, 0 0, 0 100%, from(#006600), to(#00ff33)); border-color: #5b80b2; 
+}
