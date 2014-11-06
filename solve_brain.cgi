@@ -41,7 +41,7 @@ sub output_top {
                                 body {
                                         font-family: arial, sans-serif;
                                         }
-                                h2 {
+                                h2  {
                                         color: darkblue;
                                         border-bottom: 1pt solid;
                                         width:100%;
