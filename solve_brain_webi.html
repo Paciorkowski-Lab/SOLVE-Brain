@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+<head>
+        <meta charset="utf-8" />
+        <title>SOLVE-Brain 1.0.1 Gene Annotation</title>
+        <link rel="shortcut icon" href="/static/favicon.ico" />
+        <link rel="stylesheet" href="/static/css/solve_brain.css" />
+</head>
+<body>
+        <div id="content">
+        <img src="../images/SOLVE_brain_logo.jpg" />
+        <p>Web Interface</p>
+        <hr />
+        <h2>Gene Annotation</h2>
+        <p>This tool links genes to further brain-specific annotations. You can then manage your list, and edit or remove genes.<br />
+        All data is saved using HTML5's sessionStorage, so none of your data touches our server. <br />
+        When you close your browser, the data disappears.</p>
+        <table id="genes-table">
+                <tr id="genes-head">
+                        <th>ID</th>
+                        <th>Gene</th>
+                        <th>Annotations</th>
+                </tr>
+        </table>
+
+        <form id="genes-form">
+                <div class="item text">
+                        <label>Gene:</label>
+                        <div class="field"><input type="text" name="genes" /></div>
+                </div>
+                <div class="button-wrapper">
+                        <div class="item button">
+                                <div class="field"><input type="button" id="genes-op-discard" value="Discard" /></div>
+                        </div>
+                        <div class="item button button-default">
+                                <div class="field"><input type="submit" id="genes-op-save" value="Add" /></div>
+                        </div>
+                </div>
+                <input type="hidden" name="id_entry" value="0" />
+        </form>
+        <hr />
+ <p>SOLVE-Brain also has a command-line interface for sorting and filtering VCFs. Read more about the complete tool <a href="/solve_brain/home" />here</a>.<br /><p>
+        <p><small>SOLVE-Brain 1.0.3 Paciorkowski Lab (c)2013-2014</small></p>
+        </div>
+        <script src="/static/js/solve_brain_webi.js" /></script>
+</body>
+</html>
