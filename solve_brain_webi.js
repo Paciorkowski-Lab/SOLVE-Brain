@@ -34,9 +34,17 @@ var Genes = {
                         Genes.$form.id_entry.value = 0;
                 }, true);
                 Genes.$form.addEventListener("submit", function(event) {
+                	
+                	//get the genes from the textbox(id="genes") as a list
+                	var genes = Genes.getTextboxAsArray("genes");
+                	//get the value of the id_entry to be used under the for-each loop below.
+                	var idTemp = parseInt(this.id_entry.value); 
+                	
+                	$.each(genes, function(key, value){
+                		console.log("Handling Gene: " + value);
                         var entry = {
-                                id: parseInt(this.id_entry.value),
-                                genes: this.genes.value,
+                                id: idTemp,
+                                genes: value,
                         };
                         if (entry.id == 0) { // add to the list
                                 Genes.storeAdd(entry);
@@ -46,10 +54,12 @@ var Genes = {
                                 Genes.storeEdit(entry);
                                 Genes.tableEdit(entry);
                         }
-
-                        this.reset();
-                        this.id_entry.value = 0;
-                        event.preventDefault();
+                	});
+                	
+                    this.reset();
+                    this.id_entry.value = 0;
+                    event.preventDefault();
+                	
                 }, true);
 
                 // initialize table to display user data
@@ -114,7 +124,7 @@ var Genes = {
                                 }
                          }
                                 event.preventDefault();
-                        }
+                        
                 }, true);
         },
 
@@ -161,7 +171,18 @@ var Genes = {
         },
         tableRemove: function(entry) {
                 Genes.$table.removeChild(document.getElementById("entry-"+ entry.id));
+        },
+        getTextboxAsArray : function(textboxId) { //New function to get the genes entered in the textbox as an array.      
+            var genes = jQuery('#'+textboxId).val().split(/\s+|,|;/);
+            for (var i = 0; i < genes.length; i++) {
+                if (!genes[i]) {
+                    genes.splice(i, 1);
+                    i--;
+                }
+            }
+            return genes;
         }
+
 };
 Genes.init();
 -->

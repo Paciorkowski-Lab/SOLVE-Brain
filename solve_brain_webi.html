@@ -4,11 +4,13 @@
         <meta charset="utf-8" />
         <title>SOLVE-Brain 1.0.1 Gene Annotation</title>
         <link rel="shortcut icon" href="/static/favicon.ico" />
-        <link rel="stylesheet" href="/static/css/solve_brain.css" />
+        <link rel="stylesheet" href="solve_brain.css" />
+                <script src="http://code.jquery.com/jquery-2.1.1.min.js"/></script>
+        
 </head>
 <body>
         <div id="content">
-        <img src="../images/SOLVE_brain_logo.jpg" />
+        <img src="images/SOLVE_brain_logo.jpg" />
         <p>Web Interface</p>
         <hr />
         <h2>Gene Annotation</h2>
@@ -26,8 +28,8 @@
         <form id="genes-form">
                 <div class="item text">
                         <label>Gene:</label>
-                        <div class="field"><input type="text" name="genes" /></div>
-                </div>
+						<!-- <div class="field"><input type="text" name="genes" /></div> -->
+						<div class="field"><textarea rows="2" name="genes" id="genes"></textarea></div>
                 <div class="button-wrapper">
                         <div class="item button">
                                 <div class="field"><input type="button" id="genes-op-discard" value="Discard" /></div>
@@ -42,6 +44,7 @@
  <p>SOLVE-Brain also has a command-line interface for sorting and filtering VCFs. Read more about the complete tool <a href="/solve_brain/home" />here</a>.<br /><p>
         <p><small>SOLVE-Brain 1.0.3 Paciorkowski Lab (c)2013-2014</small></p>
         </div>
-        <script src="/static/js/solve_brain_webi.js" /></script>
+        <script src="solve_brain_webi.js" /></script>
+        
 </body>
 </html>
