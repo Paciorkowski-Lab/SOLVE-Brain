@@ -2,7 +2,7 @@
 <html>
 <head>
         <meta charset="utf-8" />
-        <title>SOLVE-Brain 1.0.1 Gene Annotation</title>
+        <title>SOLVE-Brain 1.0.3 Gene Annotation</title>
         <link rel="shortcut icon" href="/static/favicon.ico" />
         <link rel="stylesheet" href="/static/css/solve_brain.css" />
         <script src="http://code.jquery.com/jquery-2.1.1.min.js"/></script>
@@ -27,15 +27,15 @@
 
         <form id="genes-form">
                 <div class="item text">
-                        <label>Gene:</label>
+                        <label></label>
 						<!-- <div class="field"><input type="text" name="genes" /></div> -->
-						<div class="field"><textarea rows="2" name="genes" id="genes"></textarea></div>
+						<div class="field"><textarea rows="2" name="genes" id="genes" placeholder="Paste genes here..." /></textarea></div>
                 <div class="button-wrapper">
+                	<div class="item button button-default">
+                                <div class="field"><input type="submit" id="genes-op-save" value="Add" /></div>
+                        </div>
                         <div class="item button">
                                 <div class="field"><input type="button" id="genes-op-discard" value="Discard" /></div>
-                        </div>
-                        <div class="item button button-default">
-                                <div class="field"><input type="submit" id="genes-op-save" value="Add" /></div>
                         </div>
                 </div>
                 <input type="hidden" name="id_entry" value="0" />
