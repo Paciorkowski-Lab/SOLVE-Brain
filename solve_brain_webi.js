@@ -82,7 +82,7 @@ var Genes = {
                 }
                 Genes.$table.addEventListener("click", function(event) {
                         var op = event.target.getAttribute("data-op");
-                        if (/edit|remove|pubmed|ucsc|lynx|allen|mgi|evs|exac/.test(op)) {
+                        if (/edit|remove|pubmed|ucsc|lynx|allen|mgi|evs/.test(op)) {
                                 var entry = JSON.parse(window.sessionStorage.getItem("Genes:"+ event.target.getAttribute("data-id")));
                                 if (op == "edit") {
                                        Genes.$form.genes.value = entry.genes;
@@ -118,10 +118,6 @@ var Genes = {
                                         var URL = "http://evs.gs.washington.edu/EVS/PopStatsServlet?searchBy=Gene+Hugo&target="+ entry.genes +"&x=0&y=0";
                                         window.open(URL, "_blank");
                                 }
-                                else if (op == "exac") {
-                                        var URL = "http://exac.broadinstitute.org/gene/"+ entry.genes;
-                                        window.open(URL, "_blank");
-                                }
                          }
                                 event.preventDefault();
                         
@@ -150,7 +146,7 @@ var Genes = {
                         }
         }
                 $td = document.createElement("td");
-                $td.innerHTML = '<a data-op="edit" data-id="'+ entry.id +'">Edit <img src="../images/pencil.png" width=20px ></a> | <a data-op="remove" data-id="'+ entry.id +'">Remove <img src="../images/delete_sm.png" width=20px /></a> | <a data-op="pubmed" data-id="'+ entry.id +'">PubMed <img src="../images/PubMed.png" /></a> | <a data-op="ucsc" data-id="'+ entry.id +'">UCSC <img src="../images/UCSC.png" width=55px /></a> | <a data-op="lynx" data-id="'+ entry.id +'">Lynx <img src="../images/lynx.png" width=55px /></a> | <a data-op="allen" data-id="'+ entry.id +'">Allen <img src="../images/aibs.png" width=55px /></a> | <a data-op="mgi" data-id="'+ entry.id +'">MGI <img src="../images/mgi.png" width=45px /></a> | <a data-op="evs" data-id="'+ entry.id +'">EVS</a> | <a data-op="exac" data-id="'+ entry.id +'">ExAC</a>';
+                $td.innerHTML = '<a data-op="edit" data-id="'+ entry.id +'">Edit <img src="../images/pencil.png" width=20px ></a> | <a data-op="remove" data-id="'+ entry.id +'">Remove <img src="../images/delete_sm.png" width=20px /></a> | <a data-op="pubmed" data-id="'+ entry.id +'">PubMed <img src="../images/PubMed.png" /></a> | <a data-op="ucsc" data-id="'+ entry.id +'">UCSC <img src="../images/UCSC.png" width=55px /></a> | <a data-op="lynx" data-id="'+ entry.id +'">Lynx <img src="../images/lynx.png" width=55px /></a> | <a data-op="allen" data-id="'+ entry.id +'">Allen <img src="../images/aibs.png" width=55px /></a> | <a data-op="mgi" data-id="'+ entry.id +'">MGI <img src="../images/mgi.png" width=45px /></a> | <a data-op="evs" data-id="'+ entry.id +'">EVS <img src="../images/nhlbi.png" width=25px /></a>';
                 $tr.appendChild($td);
                 $tr.setAttribute("id", "entry-"+ entry.id);
                 Genes.$table.appendChild($tr);
@@ -166,7 +162,7 @@ var Genes = {
                         }
                 }
                 $td = document.createElement("td");
-                $td.innerHTML = '<a data-op="edit" data-id="'+ entry.id +'">Edit <img src="../images/pencil.png" width=20px /></a> | <a data-op="remove" data-id="'+ entry.id +'">Remove <img src="../images/delete_sm.png" width=20px /></a> | <a data-op="pubmed" data-id="'+ entry.id +'">PubMed <img src="../images/PubMed.png" /></a> | <a data-op="ucsc" data-id="'+ entry.id +'">UCSC <img src="../images/UCSC.png" width=55px /></a> | <a data-op="lynx" data-id="'+ entry.id +'">Lynx <img src="../images/lynx.png" width=55px /></a> | <a data-op="allen" data-id="'+ entry.id +'">Allen <img src="../images/aibs.png" width=55px /></a> | <a data-op="mgi" data-id="'+ entry.id +'">MGI <img src="../images/mgi.png" width=45px /></a> | <a data-op="evs" data-id="'+ entry.id +'">EVS</a> | <a data-op="exac" data-id="'+ entry.id +'">ExAC</a>';
+                $td.innerHTML = '<a data-op="edit" data-id="'+ entry.id +'">Edit <img src="../images/pencil.png" width=20px /></a> | <a data-op="remove" data-id="'+ entry.id +'">Remove <img src="../images/delete_sm.png" width=20px /></a> | <a data-op="pubmed" data-id="'+ entry.id +'">PubMed <img src="../images/PubMed.png" /></a> | <a data-op="ucsc" data-id="'+ entry.id +'">UCSC <img src="../images/UCSC.png" width=55px /></a> | <a data-op="lynx" data-id="'+ entry.id +'">Lynx <img src="../images/lynx.png" width=55px /></a> | <a data-op="allen" data-id="'+ entry.id +'">Allen <img src="../images/aibs.png" width=55px /></a> | <a data-op="mgi" data-id="'+ entry.id +'">MGI <img src="../images/mgi.png" width=45px /></a> | <a data-op="evs" data-id="'+ entry.id +'">EVS <img src="../images/nhlbi.png" width=25px /></a>';
                 $tr.appendChild($td);
         },
         tableRemove: function(entry) {
