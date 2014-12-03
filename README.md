@@ -31,36 +31,9 @@ COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 *****
-To install on Linux systems:
+To use on Linux or MacOSX systems just clone our GitHub repository:
 
-1) Download the tar.gz of the latest release of SOLVE-Brain.
-
-2) Move the tarball to your home directory.
-
-3) Untar the tarball and access the unzipped directory:
-
-$ tar xvfz SOLVE-Brain-x-x-x.tar.gz
-
-$ cd SOLVE-Brain-x-x-x
-
-4) Run the install script. You need to have sudo privileges to do this.
-
-$ sudo sh install.sh
-
-That's it.
-
-*****
-To install on Mac OsX:
-
-1) Download the tar.gz of the latest version of SOLVE-Brain.
-
-2) Unzip the tarball using whatever Mac utiity you like.
-
-3) Put the SOLVE-Brain folder in your home directory.
-
-4) Run the install script from the command line. You will need sudo privileges to do this.
-
-$ sudo sh install_solve.sh
+$ git clone https://github.com/Paciorkowski-Lab/SOLVE-Brain.git
 
 That's it.
 
