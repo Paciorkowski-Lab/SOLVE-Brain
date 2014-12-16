@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 #bash_solve.sh
-#11/8/2013
+#12/15/2014
 #
 #The first part of SOLVE-Brain. This portion is a command-line tool that filters vcfs according to user specifications,
 #and reduces the vcfs to only  variants of interest. The tool also checks for known 
@@ -9,6 +9,7 @@
 #usage: sh bash_solve.sh [options] -P <pedigree_hypothesis> -i <proband_index> -I <INDEL_vcf_file> -S <SNV_vcf_file>
 #
 #Dalia Ghoneim
+#Jeff Clegg
 
 #set some default values
 pedigree_supplied=0
