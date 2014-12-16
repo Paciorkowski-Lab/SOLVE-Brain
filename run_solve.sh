@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 #bash_solve.sh
-#11/8/2013
+#12/15/2014
 #
 #The first part of SOLVE-Brain. This portion is a command-line tool that filters vcfs according to user specifications,
 #and reduces the vcfs to only  variants of interest. The tool also checks for known 
@@ -9,6 +9,7 @@
 #usage: sh bash_solve.sh [options] -P <pedigree_hypothesis> -i <proband_index> -I <INDEL_vcf_file> -S <SNV_vcf_file>
 #
 #Dalia Ghoneim
+#Jeff Clegg
 
 #set some default values
 pedigree_supplied=0
@@ -216,6 +217,10 @@ original_combined_base=$combined_basename
 #set indices
 father_index=$(($proband_index + 1))
 mother_index=$(($proband_index + 2))
+#arrays to store intermediate file names for deletion later
+snv_added_suffixes=()
+indel_added_suffixes=()
+combined_added_suffixes=()
 
 #where is ouput going? if no output path was indicated, output will be the same path base as input
 if [[ $output_indicated = 1 ]]; then
@@ -224,17 +229,43 @@ if [[ $output_indicated = 1 ]]; then
         indel_basename="$output_base"_indel
 fi
 
+printf "filtering vcfs...\n"
+#filter for exonic and UTR regions only. SOLVE currently supports only whole exome sequence data
+ 	if [[ $indel_supplied = 1 ]]; then
+                less $active_indel_vcf | grep -e exonic -e UTR > "$indel_basename"_exons_utr.vcf
+                active_indel_vcf="$indel_basename"_exons_utr.vcf
+                indel_basename=${active_indel_vcf%.*}
+                indel_added_suffixes=("${indel_added_suffixes[@]}" _exons_utr)
+
+        fi
+        if [[ $snv_supplied = 1 ]]; then
+                less $active_snv_vcf | grep -e exonic -e UTR > "$snv_basename"_exons_utr.vcf
+                active_snv_vcf="$snv_basename"_exons_utr.vcf
+                snv_basename=${active_snv_vcf%.*}	
+		snv_added_suffixes=("${snv_added_suffixes[@]}" _exons_utr)
+        fi
+        if [[ $combined_supplied = 1 ]]; then
+                less $active_combined_vcf | grep -e exonic -e UTR > "$combined_basename"_exons_utr.vcf
+		active_combined_vcf="$combined_basename"_exons_utr.vcf
+		combined_basename=${active_combined_vcf%.*}
+		combined_added_suffixes=("${combined_added_suffixes[@]}" _exons_utr)
+        fi
+
+
+
 #remove synonymous SNVs unless otherwise indicated
 if [[ $remove_synon = 1 ]]; then
 	if [[ $snv_supplied = 1 ]]; then
         	less $active_snv_vcf | grep -v -w synonymous > "$snv_basename"_nosynon.vcf
         	active_snv_vcf="$snv_basename"_nosynon.vcf
         	snv_basename=${active_snv_vcf%.*}
+		snv_added_suffixes=("${snv_added_suffixes[@]}" _nosynon)
 	fi
 	if [[ $combined_vcf_supplied = 1 ]]; then
 		less $active_combined_vcf | grep -v -w synonymous > "$combined_basename"_nosynon.vcf
 		active_combined_vcf="$combined_basename"_nosynon.vcf
 		combined_basename=${active_combined_vcf%.*}
+		combined_added_suffixes=("${combined_added_suffixes[@]}" _nosynon)
 	fi
 fi
 
@@ -244,11 +275,14 @@ if [[ $remove_nonframe = 1 ]]; then
 		less $active_indel_vcf | grep -v -w nonframeshift > "$indel_basename"_no_nonframe.vcf
         	active_indel_vcf="$indel_basename"_no_nonframe.vcf
         	indel_basename=${active_indel_vcf%.*}
+		indel_added_suffixes=("${indel_added_suffixes[@]}" _no_nonframe)
+
 	fi
 	if [[ $combined_vcf_supplied = 1 ]]; then
 		less $active_combined_vcf | grep -v -w nonframeshift > "$combined_basename"_no_nonframe.vcf
         	active_combined_vcf="$combined_basename"_no_nonframe.vcf
         	combined_basename=${active_combined_vcf%.*}
+		combined_added_suffixes=("${combined_added_suffixes[@]}" _no_nonframe)
 	fi
 fi
 #remove known SNPs unless otherwise indicated
@@ -258,16 +292,21 @@ if [[ $remove_dbSNPs = 1 ]]; then
                 grep -v rs[0-9] $active_snv_vcf > "$snv_basename"_nodbSNP.vcf
                 active_snv_vcf="$snv_basename"_nodbSNP.vcf
                 snv_basename=${active_snv_vcf%.*}
+		snv_added_suffixes=("${snv_added_suffixes[@]}" _nodbSNP)
+
         fi
         if [[ $indel_supplied = 1 ]]; then
                 grep -v rs[0-9] $active_indel_vcf > "$indel_basename"_nodbSNP.vcf
                 active_indel_vcf="$indel_basename"_nodbSNP.vcf
                 indel_basename=${active_indel_vcf%.*}
+		indel_added_suffixes=("${indel_added_suffixes[@]}" _nodbSNP)
+
         fi
         if [[ $combined_vcf_supplied = 1 ]]; then
                 grep -v rs[0-9] $active_combined_vcf > "$combined_basename"_nodbSNP.vcf
                 active_combined_vcf="$combined_basename"_nodbSNP.vcf
                 combined_basename=${active_combined_vcf%.*}
+		combined_added_suffixes=("${combined_added_suffixes[@]}" _nodbSNP)
         fi
 
 fi
@@ -279,16 +318,20 @@ if [[ $gq99_filter = 1 ]]; then
                 perl "$path_to"GQ99.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_snv_vcf > "$snv_basename"_GQ99.vcf
                 active_snv_vcf="$snv_basename"_GQ99.vcf
                 snv_basename=${active_snv_vcf%.*}
+		snv_added_suffixes=("${snv_added_suffixes[@]}" _GQ99)
         fi
         if [[ $indel_supplied = 1 ]]; then
                 perl "$path_to"GQ99.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_indel_vcf > "$indel_basename"_GQ99.vcf
                 active_indel_vcf="$indel_basename"_GQ99.vcf
                 indel_basename=${active_indel_vcf%.*}
+		indel_added_suffixes=("${indel_added_suffixes[@]}" _GQ99)
+
         fi
         if [[ $combined_vcf_supplied = 1 ]]; then
                 perl "$path_to"GQ99.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index $active_combined_vcf > "$combined_basename"_GQ99.vcf
                 active_combined_vcf="$combined_basename"_GQ99.vcf
                 combined_basename=${active_combined_vcf%.*}
+		combined_added_suffixes=("${combined_added_suffixes[@]}" _GQ99)
         fi
 
 fi
@@ -475,23 +518,27 @@ if [[ $known_gene_list != 0 && "pedigree" != "none" ]]; then
 
 fi
 
+#remove intermediate files
 if [[ $retain_int_files = 0 ]]; then
-	#remove intermediate files
-	
-	if [[ $intermed_snv_files != $original_snv_base ]]; then rm -f $intermed_snv_files.vcf; fi
-	if [[ $intermed_indel_files != $original_indel_base ]]; then rm -f $intermed_indel_files.vcf; fi
-	if [[ $intermed_combined_files != $original_combined_base ]]; then rm -f $intermed_combined_files.vcf; fi
-
-	if [[ ${intermed_snv_files%_GQ99} != $original_snv_base ]]; 	then rm -f ${intermed_snv_files%_GQ99}.vcf; fi
-	if [[ ${intermed_indel_files%_GQ99} != $original_indel_base ]]; then rm -f ${intermed_indel_files%_GQ99}.vcf; fi
-	if [[ ${intermed_combined_files%_GQ99} != $original_combined_base ]]; then rm -f ${intermed_combined_files%_GQ99}.vcf; fi
-
-	if [[ ${intermed_snv_files%_nodbSNP} != $original_snv_base ]]; then rm -f ${intermed_snv_files%_nodbSNP}.vcf; fi
-	if [[ ${intermed_indel_files%_nodbSNP} != $original_indel_base ]]; then rm -f ${intermed_indel_files%_nodbSNP}.vcf; fi
-	if [[ ${intermed_combined_files%_nodbSNP} != $original_combined_base ]]; then rm -f ${intermed_combined_files%_nodbSNP}.vcf; fi
-
-	#combined vcf with both nonframe and nonsynon removed has one more removal step...
-	if [[ $combined_vcf_supplied = 1 && $remove_nonframe = 1 && $remove_nonsynon = 1 ]]; then
-		rm -f ${intermed_combo_files%_no_nonframeshift}.vcf
-	fi
+printf "removing intermediate files....\n"
+suffixes=""
+for i in "${!snv_added_suffixes[@]}"; do
+        suffixes=${suffixes}${snv_added_suffixes[$i]}
+        rm -f "$output_base"_snv"$suffixes.vcf"
+printf "\t""$output_base"_snv"$suffixes.vcf""-->removed\n"
+done
+suffixes=""
+for i in "${!indel_added_suffixes[@]}"; do
+        suffixes=${suffixes}${indel_added_suffixes[$i]}
+        rm -f "$output_base"_indel"$suffixes.vcf"
+printf "\t""$output_base"_indel"$suffixes.vcf""-->removed\n"
+done
+suffixes=""
+for i in "${!combined_added_suffixes[@]}"; do
+        suffixes=${suffixes}${combined_added_suffixes[$i]}
+        rm -f "$output_base$suffixes.vcf"
+printf "\t""$output_base$suffixes.vcf""-->removed\n"
+done
 fi
+
+printf "Done!\n"
