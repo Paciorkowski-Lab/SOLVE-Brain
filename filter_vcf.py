@@ -56,7 +56,7 @@ def main(argv):
 	if snv != "":
 		filein = open(snv, 'r');
 	elif indel != "":
-		filein = open(snv, 'r');
+		filein = open(, 'r');
 	else
 		logging.error("no input files are given");
 		sys.exit(2);
