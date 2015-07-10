@@ -66,15 +66,21 @@ class vcf:
 		#self.indexin.close()
 
 	#father, mother indices are set in relation to proband
-	def computeParents(self, proband):
-		print('computeParents(proband):' )
+	def computeParents(self):                                     ## Why is this being passed 'proband' when vcf class knows proband index?? 
+		print('computeParents():' )
 		if not self.absentFather:
-			self.father = proband + int(self.num_affected)
+			self.father = self.proband_index + int(self.num_affected)
 		if not self.absentMother:
-			self.mother = proband + int(self.num_affected) + 1
-		print('\tproband: ' + str(proband))
+			if not self.absentFather:
+				self.mother = self.proband_index + int(self.num_affected) + 1
+			else:
+				self.mother = self.proband_index + int(self.num_affected)
+		print('\tproband: ' + str(self.proband_index))
 		print('\tfather: ' + str(self.father))
 		print('\tmother: ' + str(self.mother))
+
+		#added for testing
+		return [self.father, self.mother]
 	 
 	#parse absent parents.
 	def parseAbsentParents(self):
@@ -83,6 +89,9 @@ class vcf:
 		self.absentMother = re.search('M', self.absent) != None
 		print('\tabsentMother: ' + str(self.absentMother))
 		print('\tabsentFather: ' + str(self.absentFather))
+
+		#added for testing
+		return [self.absentFather, self.absentMother]
 	
 	#returns an array of [True, False, False, True, etc]
 	#could be used to hard filter out exonic vs non-
@@ -117,7 +126,7 @@ class vcf:
 			self.proband = self.probandOffset(line)
 			variant = self.mapReturn('1/1', line)
 			inherited = self.mapReturn('0/1', line)
-			self.computeParents(self.proband)
+			self.computeParents()
 			# print('computeAR(filein, fileout):')
 			# print('\tproband: ' + str(self.proband))
 			# print('\tfather: ' + str(self.father))
@@ -133,7 +142,7 @@ class vcf:
 			variant = self.mapReturn('0/1', line)
 			inherited = variant # this is a vanity.."nice" variable
 			notPresent = mapReturn('0/0', line)
-			self.computeParents(proband)
+			self.computeParents()
 			if ((variant[proband] and (not absentFather and inherited[father]) and (not absentMother and notPresent[mother])) or (variant[proband] and (not absentMother and inherited[mother]) and (not absentFather and notPresent[father]))):
 				fileout.write(line)
 	
@@ -143,7 +152,7 @@ class vcf:
 			variant = self.mapReturn('0/1', line)
 			inherited = variant
 			notPresent = self.mapReturn('0/0', line)
-			self.computeParents(proband)
+			self.computeParents()
 			if ((variant[proband] and (not absentFather and notPresent[father]))and (not absentMother and notPresent[mother])):
 				self.fileout.write(line)
 	
@@ -154,7 +163,7 @@ class vcf:
 				proband = self.probandOffset(line)
 				variant = self.mapReturn('0/1', line)
 				notPresent = self.mapReturn('0/0', line)
-				self.computeParents(proband)
+				self.computeParents()
 				if (variant[proband] and (not absentMother and variant[mother]) and (not absentFather and notPresent[father])):
 					self.fileout.write(line)
 	
