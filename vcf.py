@@ -124,38 +124,37 @@ class vcf:
 	
 	#you can pass in a built in flag if you want
 	def computeVCFLine(self, line): #filein = None, fileout = None
-		homo = self.mapReturn('1/1', line[self.proband:])
-		hetero = self.mapReturn('0/1', line[self.proband:])
-		absent = self.mapReturn('0/0', line[self.proband:])
+		homo = self.mapReturn('1/1', line)
+		hetero = self.mapReturn('0/1', line)
+		absent = self.mapReturn('0/0', line)
 		return (homo, hetero, absent)
 	
 	def computeAR(self, line):
 		triplet = self.computeVCFLine(line)
-		variant = triplet[0]
-		inherited = triplet[1]
+		variant, inherited = triplet[0], triplet[1]
+
+		#call perl for CH aspect...
 		
-		return (variant[self.proband] and\ 
+		return (variant[self.proband] and\
 		(not self.absentMother and inherited[self.mother]) and\
-		 (not self.absentFather and inherited[self.father])) #definition of recessive
+		(not self.absentFather and inherited[self.father])) #definition of homozygous recessive
 	
 	def computeAD(self, line):
 		triplet = self.computeVCFLine(line)
 		variant, inherited, notPresent = triplet[1], triplet[1], triplet[2]
 		
-		return ((variant[self.proband] and\ 
-		(not self.absentFather and inherited[self.father]) and\ 
-		(not self.absentMother and notPresent[self.mother])) or\ 
-		(variant[self.proband] and (not self.absentMother and\ 
+		return ((variant[self.proband] and\
+		(not self.absentFather and inherited[self.father]) and\
+		(not self.absentMother and notPresent[self.mother])) or\
+		(variant[self.proband] and (not self.absentMother and\
 		inherited[self.mother]) and (not self.absentFather and notPresent[self.father])))
 	
 	def computeDN(self, line):
 		triplet = self.computeVCFLine(line)
-		variant = triplet[1]
-		inherited = variant
-		notPresent = triplet[2]
+		variant, inherited, notPresent = triplet[1], triplet[1], triplet[2]
 		
-		return ((variant[self.proband] and\ 
-		(not self.absentFather and notPresent[self.father]))and\ 
+		return ((variant[self.proband] and\
+		(not self.absentFather and notPresent[self.father]))and\
 		(not self.absentMother and notPresent[self.mother]))
 	
 	def computeXL(self, line):
@@ -163,8 +162,8 @@ class vcf:
 		if xChrom[0]: #X chromosome
 			triplet = self.computeVCFLine(line)
 			variant, notPresent = triplet[1], triplet[2]
-			return (variant[self.proband] and\ 
-			(not self.absentMother and variant[self.mother]) and\ 
+			return (variant[self.proband] and\
+			(not self.absentMother and variant[self.mother]) and\
 			(not self.absentFather and notPresent[self.father]))
 	
 #could potentially makes this more of a "standalone" method
