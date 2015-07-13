@@ -5,7 +5,7 @@ class vcf:
 	
 	# def __init__(self):
 	# 	self.num_affected = '' 
-	# 	self.proband_index = ''
+	# 	self.proband = ''
 	# 	self.absent = ''
 	# 	self.absentMother = ''
 	# 	self.absentFather = ''
@@ -21,7 +21,7 @@ class vcf:
 	# 	self.fileout = None; 
 	
 	def __init__(self, proband_index = None, num_affected = None, absent = None, snv = None, indel = None, pedigree = None, output = None):
-		self.proband_index = proband_index
+		self.proband = proband_index
 		self.num_affected = num_affected
 		self.absent = absent
 		self.snv = snv
@@ -69,13 +69,13 @@ class vcf:
 	def computeParents(self):                                     ## Why is this being passed 'proband' when vcf class knows proband index?? 
 		print('computeParents():' )
 		if not self.absentFather:
-			self.father = self.proband_index + int(self.num_affected)
+			self.father = self.proband + int(self.num_affected)
 		if not self.absentMother:
 			if not self.absentFather:
-				self.mother = self.proband_index + int(self.num_affected) + 1
+				self.mother = self.proband + int(self.num_affected) + 1
 			else:
-				self.mother = self.proband_index + int(self.num_affected)
-		print('\tproband: ' + str(self.proband_index))
+				self.mother = self.proband + int(self.num_affected)
+		print('\tproband: ' + str(self.proband))
 		print('\tfather: ' + str(self.father))
 		print('\tmother: ' + str(self.mother))
 
@@ -116,57 +116,59 @@ class vcf:
 		for i in arrIndex:
 			index = 1+index
 			if i:
+				self.proband = index + self.idOffset #breaking any rules here..?
 				return index+self.idOffset #global--declares the offset from 1st proband correspondint to person of interest.
 															#no need to reshuffle columns. make sure it reflects the person you need.
 		#fail case
 		return -1 
 	
-	def computeAR(self, filein, fileout):
-		for line in filein:
-			self.proband = self.probandOffset(line)
-			variant = self.mapReturn('1/1', line)
-			inherited = self.mapReturn('0/1', line)
-			self.computeParents()
-			# print('computeAR(filein, fileout):')
-			# print('\tproband: ' + str(self.proband))
-			# print('\tfather: ' + str(self.father))
-			# print('\tmother: ' + str(self.mother))
-			if (variant[self.proband] and (not self.absentMother and inherited[self.mother]) and (not self.absentFather and inherited[self.father])): #definition of recessive
-				print('true, right to file')
-				self.fileout.write(line)
-		print('end computeAR(filein, fileout)')
+	#you can pass in a built in flag if you want
+	def computeVCFLine(self, line): #filein = None, fileout = None
+		homo = self.mapReturn('1/1', line[self.proband:])
+		hetero = self.mapReturn('0/1', line[self.proband:])
+		absent = self.mapReturn('0/0', line[self.proband:])
+		return (homo, hetero, absent)
 	
-	def computeAD(filein, fileout):
-		for line in filein:
-			proband = self.probandOffset(line)
-			variant = self.mapReturn('0/1', line)
-			inherited = variant # this is a vanity.."nice" variable
-			notPresent = mapReturn('0/0', line)
-			self.computeParents()
-			if ((variant[proband] and (not absentFather and inherited[father]) and (not absentMother and notPresent[mother])) or (variant[proband] and (not absentMother and inherited[mother]) and (not absentFather and notPresent[father]))):
-				fileout.write(line)
+	def computeAR(self, line):
+		triplet = self.computeVCFLine(line)
+		variant = triplet[0]
+		inherited = triplet[1]
+		
+		return (variant[self.proband] and\ 
+		(not self.absentMother and inherited[self.mother]) and\
+		 (not self.absentFather and inherited[self.father])) #definition of recessive
 	
-	def computeDN(self, filein, fileout):
-		for line in filein:
-			proband = self.probandOffset(line)
-			variant = self.mapReturn('0/1', line)
-			inherited = variant
-			notPresent = self.mapReturn('0/0', line)
-			self.computeParents()
-			if ((variant[proband] and (not absentFather and notPresent[father]))and (not absentMother and notPresent[mother])):
-				self.fileout.write(line)
+	def computeAD(self, line):
+		triplet = self.computeVCFLine(line)
+		variant, inherited, notPresent = triplet[1], triplet[1], triplet[2]
+		
+		return ((variant[self.proband] and\ 
+		(not self.absentFather and inherited[self.father]) and\ 
+		(not self.absentMother and notPresent[self.mother])) or\ 
+		(variant[self.proband] and (not self.absentMother and\ 
+		inherited[self.mother]) and (not self.absentFather and notPresent[self.father])))
 	
-	def computeXL(self, filein, fileout):
-		for line in filein:
-			xChrom = self.mapReturn('X', line)
-			if xChrom[0]: #X chromosome
-				proband = self.probandOffset(line)
-				variant = self.mapReturn('0/1', line)
-				notPresent = self.mapReturn('0/0', line)
-				self.computeParents()
-				if (variant[proband] and (not absentMother and variant[mother]) and (not absentFather and notPresent[father])):
-					self.fileout.write(line)
+	def computeDN(self, line):
+		triplet = self.computeVCFLine(line)
+		variant = triplet[1]
+		inherited = variant
+		notPresent = triplet[2]
+		
+		return ((variant[self.proband] and\ 
+		(not self.absentFather and notPresent[self.father]))and\ 
+		(not self.absentMother and notPresent[self.mother]))
 	
+	def computeXL(self, line):
+		xChrom = self.mapReturn('X', line)
+		if xChrom[0]: #X chromosome
+			triplet = self.computeVCFLine(line)
+			variant, notPresent = triplet[1], triplet[2]
+			return (variant[self.proband] and\ 
+			(not self.absentMother and variant[self.mother]) and\ 
+			(not self.absentFather and notPresent[self.father]))
+	
+#could potentially makes this more of a "standalone" method
+	#in that case probandOffset, offsets are needed
 	def computePedigree(self, filein=None, fileout=None):
 #		self.__computePedigree(self.filein, self.fileout)
 		if filein != None:
@@ -177,14 +179,23 @@ class vcf:
 		print('computePedigree(filein, fileout)')
 		print('\tpedigree: ' + self.pedigree)
 		self.parseAbsentParents()
+		self.computeParents()
 		if self.pedigree == 'AR':
-			self.computeAR(filein, fileout)
+			for line in self.filein:
+				if self.computeAR(line):
+					self.fileout.write(line)
 		elif self.pedigree == 'AD':
-			self.computeAD(filein, fileout)
+			for line in self.filein:
+				if self.computeAD(line):
+					self.fileout.write(line)
 		elif self.pedigree == 'DN':
-			self.computeDN(filein, fileout)
+			for line in self.filein:
+				if self.computeDN(line):
+					self.fileout.write(line)
 		elif pedigree == 'XL':
-			self.computeXL(filein, fileout)
+			for line in self.filein:
+				if self.computeXL(line):
+					self.fileout.write(line)
 	
 	def buildGeneHash(self, filein = None):
 		if filein != None:
@@ -245,7 +256,7 @@ class vcf:
 
 def main(argv):
 	pedigree = '' 
-	proband_index = '' 
+	proband = '' 
 	num_affected = ''
 	father = '' 
 	mother = ''
@@ -269,7 +280,7 @@ def main(argv):
 		elif opt in ('--NUM_AFFECTED', '-a'):
 			num_affected = arg
 		elif opt in ('--PROBAND', '-i'):
-			proband_index = arg; #but we dont really use it now
+			proband = arg; #but we dont really use it now
 		elif opt in ('--SNV', '-S'):
 			snv = arg
 		elif opt in ('--INDEL', '-I'):
@@ -286,7 +297,7 @@ def main(argv):
 	logging.info('Done capturing params')
 	print('Done capturing params')
  
-	#x = vcf(proband_index, num_affected, absent, snv, indel, pedigree, output)
+	x = vcf(proband, num_affected, absent, snv, indel, pedigree, output)
 	#x.buildGeneHash()
 	
 	x.computePedigree()
