@@ -98,7 +98,7 @@ class vcf:
 	def mapReturn(self,searchStr,line):
 		print('mapReturn(searchStr, line):')
 		print('\tsearchStr: ' + searchStr + ' line: ' + line)
-		v = map(lambda x: re.search(searchStr, x) != None, line.split())
+		v = map(lambda x: re.search(searchStr, x) != None, line.split('\t'))
 		print('v: ' + str(v))
 	#	variant = map(lambda x: x != None, v)
 	#	print('variant: ' + str(variant))
