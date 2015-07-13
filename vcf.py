@@ -194,7 +194,7 @@ class vcf:
 				print self.geneHash[gene][var]
 
 	def computeCompoundHet(self):
-		outfile = open('CH_out_1-1_strict.txt', 'w')
+		outfile = open('CH_out_1-1_strict_attempt2.txt', 'w')
 		compHet = {}
 
 		for gene in self.geneHash:
