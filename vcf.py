@@ -167,7 +167,7 @@ class vcf:
 			(not self.absentMother and variant[self.mother]) and\ 
 			(not self.absentFather and notPresent[self.father]))
 	
-#could potentially makes this a "standalone" method
+#could potentially makes this more of a "standalone" method
 	#in that case probandOffset, offsets are needed
 	def computePedigree(self, filein=None, fileout=None):
 #		self.__computePedigree(self.filein, self.fileout)
