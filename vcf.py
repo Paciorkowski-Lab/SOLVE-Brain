@@ -167,10 +167,13 @@ class vcf:
 				if (variant[proband] and (not absentMother and variant[mother]) and (not absentFather and notPresent[father])):
 					self.fileout.write(line)
 	
-	def computePedigree(self):
-		self.__computePedigree(self.filein, self.fileout)
-	
-	def __computePedigree(self, filein, fileout):
+	def computePedigree(self, filein=None, fileout=None):
+#		self.__computePedigree(self.filein, self.fileout)
+		if filein != None:
+			self.filein = filein
+		if fileout != None:
+			self.fileout = fileout	
+		
 		print('computePedigree(filein, fileout)')
 		print('\tpedigree: ' + self.pedigree)
 		self.parseAbsentParents()
@@ -202,6 +205,7 @@ class vcf:
 			for var in self.geneHash[gene]:
 				print self.geneHash[gene][var]
 
+	#still in progress
 	def computeCompoundHet(self):
 		outfile = open('CH_out_1-1_strict_attempt2.txt', 'w')
 		compHet = {}
@@ -282,10 +286,10 @@ def main(argv):
 	logging.info('Done capturing params')
 	print('Done capturing params')
  
-	x = vcf(proband_index, num_affected, absent, snv, indel, pedigree, output)
-	x.buildGeneHash()
+	#x = vcf(proband_index, num_affected, absent, snv, indel, pedigree, output)
+	#x.buildGeneHash()
 	
-	#x.computePedigree()
+	x.computePedigree()
 	x.close()
  
 if __name__ == "__main__":
