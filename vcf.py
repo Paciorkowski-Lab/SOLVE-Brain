@@ -66,7 +66,8 @@ class vcf:
 		#self.indexin.close()
 
 	#father, mother indices are set in relation to proband
-	def computeParents(self):                                     ## Why is this being passed 'proband' when vcf class knows proband index?? 
+	def computeParents(self):
+		self.parseAbsentParents()
 		print('computeParents():' )
 		if not self.absentFather:
 			self.father = self.proband + int(self.num_affected)
@@ -106,22 +107,34 @@ class vcf:
 	
 	#detects the proband offset for the current line.
 	#could use a general method, compute all offsets.
-	def probandOffset(self, line, offset = None):
-		if offset != None:
-			self.idOffset = offset
+	# def probandOffset(self, line, offset = None):
+	# 	if offset != None:
+	# 		self.idOffset = offset
 
-		print('probandOffset:')
-		arrIndex = self.mapReturn('GT:AD:DP:GQ:PL', line)
-		index = 0 #index('')
-		for i in arrIndex:
-			index = 1+index
-			if i:
-				self.proband = index + self.idOffset #breaking any rules here..?
-				return index+self.idOffset #global--declares the offset from 1st proband correspondint to person of interest.
-															#no need to reshuffle columns. make sure it reflects the person you need.
-		#fail case
-		return -1 
+	# 	print('probandOffset:')
+	# 	arrIndex = self.mapReturn('GT:AD:DP:GQ:PL', line)
+	# 	index = 0 #index('')
+	# 	for i in arrIndex:
+	# 		index = 1+index
+	# 		if i:
+	# 			self.proband = index + self.idOffset #breaking any rules here..?
+	# 			return index+self.idOffset #global--declares the offset from 1st proband correspondint to person of interest.
+	# 														#no need to reshuffle columns. make sure it reflects the person you need.
+	# 	#fail case
+	# 	return -1 
 	
+	def isProbands(self, variant):
+		for i in range(self.num_affected):
+			if not variant[self.proband + i]:
+				return False
+		return True
+
+	def isFather(self, the_array):
+		return (not self.absentFather and the_array[self.father]) or self.absentFather
+
+	def isMother(self, the_array):
+		return (not self.absentMother and the_array[self.mother]) or self.absentMother
+
 	#you can pass in a built in flag if you want
 	def computeVCFLine(self, line): #filein = None, fileout = None
 		homo = self.mapReturn('1/1', line)
@@ -135,36 +148,44 @@ class vcf:
 
 		#call perl for CH aspect...
 		
-		return (variant[self.proband] and\
-		(not self.absentMother and inherited[self.mother]) and\
-		(not self.absentFather and inherited[self.father])) #definition of homozygous recessive
-	
+		return self.isProbands(variant) and (self.isFather(inherited) and self.isMother(inherited))
+
+		# return (variant[self.proband] and\
+		# (not self.absentMother and inherited[self.mother]) and\
+		# (not self.absentFather and inherited[self.father])) #definition of homozygous recessive
+
 	def computeAD(self, line):
 		triplet = self.computeVCFLine(line)
 		variant, inherited, notPresent = triplet[1], triplet[1], triplet[2]
+
+		return self.isProbands(variant) and (self.isFather(inherited) != self.isMother(inherited))
 		
-		return ((variant[self.proband] and\
-		(not self.absentFather and inherited[self.father]) and\
-		(not self.absentMother and notPresent[self.mother])) or\
-		(variant[self.proband] and (not self.absentMother and\
-		inherited[self.mother]) and (not self.absentFather and notPresent[self.father])))
+		# return ((variant[self.proband] and\
+		# ((not self.absentFather and inherited[self.father])  or self.absentFather) and\
+		# ((not self.absentMother and notPresent[self.mother])  or self.absentMother)) or\
+		# (variant[self.proband] and ((not self.absentMother and\
+		# inherited[self.mother])  or self.absentMother) and ((not self.absentFather and notPresent[self.father])  or self.absentFather)))
 	
 	def computeDN(self, line):
 		triplet = self.computeVCFLine(line)
 		variant, inherited, notPresent = triplet[1], triplet[1], triplet[2]
 		
-		return ((variant[self.proband] and\
-		(not self.absentFather and notPresent[self.father]))and\
-		(not self.absentMother and notPresent[self.mother]))
+		return self.isProbands(variant) and (self.isFather(notPresent) and self.isMother(notPresent))
+
+		# return (variant[self.proband] and ((not self.absentFather and notPresent[self.father]) or self.absentFather) and\
+		# (not self.absentMother and notPresent[self.mother] or self.absentMother))
 	
 	def computeXL(self, line):
 		xChrom = self.mapReturn('X', line)
 		if xChrom[0]: #X chromosome
 			triplet = self.computeVCFLine(line)
-			variant, notPresent = triplet[1], triplet[2]
-			return (variant[self.proband] and\
-			(not self.absentMother and variant[self.mother]) and\
-			(not self.absentFather and notPresent[self.father]))
+			variant, inherited , notPresent = triplet[1], triplet[1], triplet[2]
+
+			return self.isProbands(variant) and (self.isFather(notPresent) and self.isMother(inherited))
+
+			# return (variant[self.proband] and\
+			# (not self.absentMother and variant[self.mother]) and\
+			# (not self.absentFather and notPresent[self.father]))
 	
 #could potentially makes this more of a "standalone" method
 	#in that case probandOffset, offsets are needed
@@ -177,7 +198,6 @@ class vcf:
 		
 		print('computePedigree(filein, fileout)')
 		print('\tpedigree: ' + self.pedigree)
-		self.parseAbsentParents()
 		self.computeParents()
 		if self.pedigree == 'AR':
 			for line in self.filein:
