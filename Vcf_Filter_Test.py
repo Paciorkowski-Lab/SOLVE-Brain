@@ -16,6 +16,38 @@ class Vcf_Filter_Test(unittest.TestCase):
 	vcf_line_with_DN_4 = "1\t17029257\t17029257\tT\tC\tncRNA_exonic\tESPNP\tNA\tNA\tScore=474;Name=lod=113\tScore=0.952198;Name=chr1:6487720\trs12125112\tNA\tNA\tNA\t1\t17029257\t.\tT\tC\t3028.67\t.\tAC=9;AF=0.321;AN=28;BaseQRankSum=10.941;DP=675;Dels=0.00;FS=4.191;HaplotypeScore=0.9870;InbreedingCoeff=-0.4739;MLEAC=9;MLEAF=0.321;MQ=57.95;MQ0=1;MQRankSum=2.043;QD=7.16;ReadPosRankSum=0.686\tGT:AD:DP:GQ:PL\t0/1:51,12:63:99:176,0,1388\t0/1:51,10:61:99:150,0,1382\t0/0:28,17:45:99:435,0,690\t0/0:46,3:50:25:0,25,1312\t0/1:52,10:62:99:109,0,1371\t0/1:17,31:48:99:741,0,442\t0/0:53,0:53:99:0,123,1502\t0/1:14,16:30:99:431,0,363\t0/0:64,0:65:99:0,162,1949\t0/0:48,0:48:99:0,135,1558\t0/1:26,19:45:99:454,0,640\t0/1:24,17:41:99:401,0,585\t0/1:19,9:28:99:197,0,527\t0/0:36,0:36:93:0,93,1086"
 	proband_index_QTB  = [24, 27, 30, 33, 36, 39, 42]
 	proband_index_June = [24, 28, 31, 35, 36]
+	June_Cohort = {
+		"DB14-001": {
+						"index": 24,
+						"parents": [26,27],
+						"num_affected": 2,
+						"absent": ""
+					},
+		"DB14-029": {
+						"index": 28,
+						"parents": [29,30],
+						"num_affected": 1,
+						"absent": ""
+					},
+		"MP14-001": {
+						"index": 31,
+						"parents": [33,34],
+						"num_affected": 2,
+						"absent": ""
+					},
+		"MP14-003": {
+						"index": 35,
+						"parents": [0,0],
+						"num_affected": 1,
+						"absent": "MF"
+					},
+		"MP14-004": {
+						"index": 36,
+						"parents": [0,37],
+						"num_affected": 1,
+						"absent": "F"
+					}
+	}
 	parent_index_June  = [[26, 27], [29, 30], [33, 34], [0, 0] ,[0, 37]]
 	number_affected_QTB = [1, 1, 1, 1, 1, 1, 1]
 	number_affected_June = [2, 1, 2, 1, 1]
@@ -27,7 +59,10 @@ class Vcf_Filter_Test(unittest.TestCase):
 	pedigree = ["DN", "AR", "AD", "XL"]
 
 	def setUp(self):
-		pass
+		# print("===================")
+		# print(self.June_Cohort["DB14-029"]["parents"])
+		# print("===================")
+
 
 	#Test parent parsing
 	def test_parse_parents_no_absent(self):
