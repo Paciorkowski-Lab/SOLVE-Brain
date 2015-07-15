@@ -30,12 +30,13 @@ class vcf:
 		self.output = output
 		self.mother = 0
 		self.father = 0
+		self.parent_num = 0                                                         ##Frankie-change
 		self.absentMother = ''
 		self.absentFather = ''
 		self.idOffset = None
 		self.filein = None
 		self.fileout = None
-
+		self.false_array = [False for skipped in range(self.proband)]               ##Frankie-change
 		#build gene dict
 		self.geneHash = {}
 			
@@ -71,11 +72,13 @@ class vcf:
 		print('computeParents():' )
 		if not self.absentFather:
 			self.father = self.proband + int(self.num_affected)
+			self.parent_num += 1                                                    ##Frankie-change
 		if not self.absentMother:
 			if not self.absentFather:
 				self.mother = self.proband + int(self.num_affected) + 1
 			else:
 				self.mother = self.proband + int(self.num_affected)
+			self.parent_num += 1                                                    ##Frankie-change
 		print('\tproband: ' + str(self.proband))
 		print('\tfather: ' + str(self.father))
 		print('\tmother: ' + str(self.mother))
@@ -99,11 +102,12 @@ class vcf:
 	def mapReturn(self,searchStr,line):
 		print('mapReturn(searchStr, line):')
 		print('\tsearchStr: ' + searchStr + ' line: ' + line)
-		v = map(lambda x: re.search(searchStr, x) != None, line.split('\t'))
-		print('v: ' + str(v))
+		v = map(lambda x: re.search(searchStr, x) != None, line.split('\t')[self.proband:(self.proband + self.num_affected + self.parent_num)])         ##Frankie-change
+		#v = map(lambda x: re.search(searchStr, x) != None, line.split('\t')[self.proband:])         ##Frankie-change
+		print('v: ' + str(self.false_array + v))                                                    ##Frankie-change
 	#	variant = map(lambda x: x != None, v)
 	#	print('variant: ' + str(variant))
-		return v
+		return self.false_array + v                                                                 ##Frankie-change
 	
 	#detects the proband offset for the current line.
 	#could use a general method, compute all offsets.
@@ -140,10 +144,12 @@ class vcf:
 		homo = self.mapReturn('1/1', line)
 		hetero = self.mapReturn('0/1', line)
 		absent = self.mapReturn('0/0', line)
+		#return {"homozygous": homo, "heterozygous": hetero, "absent": absent}            ##Frankie-change
 		return (homo, hetero, absent)
 	
 	def computeAR(self, line):
 		triplet = self.computeVCFLine(line)
+		#variant, inherited = triplet["homozygous"], triplet["heterozygous"]              ##Frankie-change
 		variant, inherited = triplet[0], triplet[1]
 
 		#call perl for CH aspect...
@@ -158,7 +164,11 @@ class vcf:
 		triplet = self.computeVCFLine(line)
 		variant, inherited, notPresent = triplet[1], triplet[1], triplet[2]
 
-		return self.isProbands(variant) and (self.isFather(inherited) != self.isMother(inherited))
+		#return self.isProbands(variant) and (self.isFather(inherited) != self.isMother(inherited))
+		if self.absentFather and self.absentMother:
+			return self.isProbands(variant)
+		else:
+			return self.isProbands(variant) and ((self.isFather(inherited) != self.absentFather) != (self.isMother(inherited) != self.absentMother))
 		
 		# return ((variant[self.proband] and\
 		# ((not self.absentFather and inherited[self.father])  or self.absentFather) and\
@@ -176,8 +186,9 @@ class vcf:
 		# (not self.absentMother and notPresent[self.mother] or self.absentMother))
 	
 	def computeXL(self, line):
-		xChrom = self.mapReturn('X', line)
-		if xChrom[0]: #X chromosome
+		#xChrom = self.mapReturn('X', line)               ##Frankie-change
+		#if xChrom[0]: #X chromosome                      ##Frankie-change
+		if re.search("X", line[:1]) != None:              ##Frankie-change
 			triplet = self.computeVCFLine(line)
 			variant, inherited , notPresent = triplet[1], triplet[1], triplet[2]
 
