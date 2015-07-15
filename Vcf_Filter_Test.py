@@ -18,6 +18,11 @@ class Vcf_Filter_Test(unittest.TestCase):
 	vcf_line_with_DN_3 = "1\t17029257\t17029257\tT\tC\tncRNA_exonic\tESPNP\tNA\tNA\tScore=474;Name=lod=113\tScore=0.952198;Name=chr1:6487720\trs12125112\tNA\tNA\tNA\t1\t17029257\t.\tT\tC\t3028.67\t.\tAC=9;AF=0.321;AN=28;BaseQRankSum=10.941;DP=675;Dels=0.00;FS=4.191;HaplotypeScore=0.9870;InbreedingCoeff=-0.4739;MLEAC=9;MLEAF=0.321;MQ=57.95;MQ0=1;MQRankSum=2.043;QD=7.16;ReadPosRankSum=0.686\tGT:AD:DP:GQ:PL\t0/1:51,12:63:99:176,0,1388\t0/1:51,10:61:99:150,0,1382\t0/1:28,17:45:99:435,0,690\t0/0:46,3:50:25:0,25,1312\t0/1:52,10:62:99:109,0,1371\t0/1:17,31:48:99:741,0,442\t0/0:53,0:53:99:0,123,1502\t0/1:14,16:30:99:431,0,363\t0/0:64,0:65:99:0,162,1949\t0/0:48,0:48:99:0,135,1558\t0/1:26,19:45:99:454,0,640\t0/1:24,17:41:99:401,0,585\t0/1:19,9:28:99:197,0,527\t0/0:36,0:36:93:0,93,1086"
 	#DN for DB14-001, AD for 029, not in sibling for MP14-001, DN in 004 and present in 003
 	vcf_line_with_DN_4 = "1\t17029257\t17029257\tT\tC\tncRNA_exonic\tESPNP\tNA\tNA\tScore=474;Name=lod=113\tScore=0.952198;Name=chr1:6487720\trs12125112\tNA\tNA\tNA\t1\t17029257\t.\tT\tC\t3028.67\t.\tAC=9;AF=0.321;AN=28;BaseQRankSum=10.941;DP=675;Dels=0.00;FS=4.191;HaplotypeScore=0.9870;InbreedingCoeff=-0.4739;MLEAC=9;MLEAF=0.321;MQ=57.95;MQ0=1;MQRankSum=2.043;QD=7.16;ReadPosRankSum=0.686\tGT:AD:DP:GQ:PL\t0/1:51,12:63:99:176,0,1388\t0/1:51,10:61:99:150,0,1382\t0/0:28,17:45:99:435,0,690\t0/0:46,3:50:25:0,25,1312\t0/1:52,10:62:99:109,0,1371\t0/1:17,31:48:99:741,0,442\t0/0:53,0:53:99:0,123,1502\t0/1:14,16:30:99:431,0,363\t0/0:64,0:65:99:0,162,1949\t0/0:48,0:48:99:0,135,1558\t0/1:26,19:45:99:454,0,640\t0/1:24,17:41:99:401,0,585\t0/1:19,9:28:99:197,0,527\t0/0:36,0:36:93:0,93,1086"
+	vcf_line_not_X_chromo = "1\t11894427\t11894427\tG\tA\texonic\tCLCN6\tnonsynonymous SNV\tCLCN6:NM_001256959:exon15:c.G1595A:p.G532E,CLCN6:NM_001286:exon16:c.G1661A:p.G554E\tScore=369;Name=lod=42\tNA\tNA\tName=yes\tNA\tNA\t1\t11894427\t.\tG\tA\t630.50\t.\tAC=1;AF=0.036;AN=28;BaseQRankSum=-0.102;DP=894;Dels=0.00;FS=0.000;HaplotypeScore=1.2653;InbreedingCoeff=-0.0370;MLEAC=1;MLEAF=0.036;MQ=59.57;MQ0=0;MQRankSum=1.571;QD=11.26;ReadPosRankSum=0.187\tGT:AD:DP:GQ:PL\t0/0:65,0:65:99:0,147,1837\t0/0:64,0:64:99:0,153,1849\t0/0:77,0:77:99:0,183,2195\t0/0:71,0:71:99:0,162,1974\t0/1:27,29:56:99:666,0,609\t0/0:67,0:67:99:0,156,1934\t0/1:61,0:61:99:0,141,1731\t0/0:70,0:70:99:0,156,1939\t0/0:53,0:53:99:0,126,1533\t0/0:76,0:77:99:0,171,2132\t0/0:62,0:62:99:0,147,1778\t0/0:55,0:55:99:0,135,1625\t0/0:57,0:57:99:0,138,1657\t0/0:59,0:59:99:0,150,1743"
+	#DB14-001 XL but sibling does not contain variant, 004's mom contains variant that 004 does not, DN for 029, XL for MP14-001, 003 not present
+	vcf_line_with_XL = "X\t12725701\t12725701\tC\tG\texonic\tFRMPD4\tsynonymous SNV\tFRMPD4:NM_014728:exon13:c.C1401G:p.V467V\tScore=617;Name=lod=431\tNA\trs6641078\tNA\tNA\tNA\tX\t12725701\t.\tC\tG\t1610.84\t.\tAC=3;AF=0.107;AN=28;BaseQRankSum=-3.730;DP=384;Dels=0.00;FS=5.291;HaplotypeScore=0.4845;InbreedingCoeff=-0.1200;MLEAC=3;MLEAF=0.107;MQ=59.32;MQ0=1;MQRankSum=-0.152;QD=13.10;ReadPosRankSum=-0.116\tGT:AD:DP:GQ:PL\t0/1:17,24:41:99:613,0,442\t0/0:21,0:21:48:0,48,618\t0/0:25,0:25:66:0,66,812\t0/1:25,29:54:99:724,0,696\t0/1:22,0:22:54:0,54,676\t0/0:25,0:25:54:0,54,700\t0/0:32,0:32:78:0,78,981\t0/1:14,0:14:36:0,36,441\t0/1:23,0:23:60:0,60,732\t0/0:18,0:18:39:0,39,506\t0/1:32,0:32:75:0,75,946\t0/0:15,0:15:42:0,42,496\t0/0:34,0:34:87:0,87,1077\t0/1:15,13:28:99:324,0,398"
+	#MP14-001 inherited from dad not mom, 003 present, XL for 004, DB14-001 siblings have DN, XL for 029
+	vcf_line_with_XL_2 = "X\t12725701\t12725701\tC\tG\texonic\tFRMPD4\tsynonymous SNV\tFRMPD4:NM_014728:exon13:c.C1401G:p.V467V\tScore=617;Name=lod=431\tNA\trs6641078\tNA\tNA\tNA\tX\t12725701\t.\tC\tG\t1610.84\t.\tAC=3;AF=0.107;AN=28;BaseQRankSum=-3.730;DP=384;Dels=0.00;FS=5.291;HaplotypeScore=0.4845;InbreedingCoeff=-0.1200;MLEAC=3;MLEAF=0.107;MQ=59.32;MQ0=1;MQRankSum=-0.152;QD=13.10;ReadPosRankSum=-0.116\tGT:AD:DP:GQ:PL\t0/1:17,24:41:99:613,0,442\t0/1:21,0:21:48:0,48,618\t0/0:25,0:25:66:0,66,812\t0/0:25,29:54:99:724,0,696\t0/1:22,0:22:54:0,54,676\t0/0:25,0:25:54:0,54,700\t0/1:32,0:32:78:0,78,981\t0/1:14,0:14:36:0,36,441\t0/1:23,0:23:60:0,60,732\t0/1:18,0:18:39:0,39,506\t0/0:32,0:32:75:0,75,946\t0/1:15,0:15:42:0,42,496\t0/1:34,0:34:87:0,87,1077\t0/1:15,13:28:99:324,0,398"	
 	proband_index_QTB  = [24, 27, 30, 33, 36, 39, 42]
 	proband_index_June = [24, 28, 31, 35, 36]
 	June_Cohort = {
@@ -249,7 +254,61 @@ class Vcf_Filter_Test(unittest.TestCase):
 		vcf_test.computeParents()
 		self.assertTrue(vcf_test.computeAD(self.vcf_line_with_DN_2), "Compute AD did not find variant to be inherited from mother")
 
+	#ComputeXL testing
+	def test_compute_XL_not_X_chromo(self):
+		vcf_test = vcf(self.June_Cohort["DB14-029"]["index"], self.June_Cohort["DB14-029"]["num_affected"], self.June_Cohort["DB14-029"]["absent"])
+		vcf_test.computeParents()
+		self.assertFalse(vcf_test.computeXL(self.vcf_line_not_X_chromo), "Compute XL thought this was the X chromosome (actually 20)")
 
+	def test_compute_XL_false_both_parents(self):
+		vcf_test = vcf(self.June_Cohort["DB14-029"]["index"], self.June_Cohort["DB14-029"]["num_affected"], self.June_Cohort["DB14-029"]["absent"])
+		vcf_test.computeParents()
+		self.assertFalse(vcf_test.computeXL(self.vcf_line_with_XL), "Compute XL thought a DN variant was XL")		
+
+	def test_compute_XL_true_both_parents(self):
+		vcf_test = vcf(self.June_Cohort["DB14-029"]["index"], self.June_Cohort["DB14-029"]["num_affected"], self.June_Cohort["DB14-029"]["absent"])
+		vcf_test.computeParents()
+		self.assertTrue(vcf_test.computeXL(self.vcf_line_with_XL_2), "Compute XL did not recognize an XL variant")
+
+	def test_compute_XL_false_multiAffected_both_parents(self):
+		vcf_test = vcf(self.June_Cohort["DB14-001"]["index"], self.June_Cohort["DB14-001"]["num_affected"], self.June_Cohort["DB14-001"]["absent"])
+		vcf_test.computeParents()
+		self.assertFalse(vcf_test.computeXL(self.vcf_line_with_XL), "Compute XL did not realize sibling is missing variant")
+
+	def test_compute_XL_false_multiAffected_inherited_from_dad(self):
+		vcf_test = vcf(self.June_Cohort["MP14-001"]["index"], self.June_Cohort["MP14-001"]["num_affected"], self.June_Cohort["MP14-001"]["absent"])
+		vcf_test.computeParents()
+		self.assertFalse(vcf_test.computeXL(self.vcf_line_with_XL_2), "Compute XL did not realize inheritance was from father")
+
+	def test_compute_XL_true_multiAffected_both_parents(self):
+		vcf_test = vcf(self.June_Cohort["MP14-001"]["index"], self.June_Cohort["MP14-001"]["num_affected"], self.June_Cohort["MP14-001"]["absent"])
+		vcf_test.computeParents()
+		self.assertTrue(vcf_test.computeXL(self.vcf_line_with_XL), "Compute XL did not work for two sibilings")
+
+	def test_compute_XL_false_no_parents(self):
+		vcf_test = vcf(self.June_Cohort["MP14-003"]["index"], self.June_Cohort["MP14-003"]["num_affected"], self.June_Cohort["MP14-003"]["absent"])
+		vcf_test.computeParents()
+		self.assertFalse(vcf_test.computeXL(self.vcf_line_with_XL), "Compute XL did not recognize that proband has no variant")
+
+	def test_compute_XL_true_no_parents(self):
+		vcf_test = vcf(self.June_Cohort["MP14-003"]["index"], self.June_Cohort["MP14-003"]["num_affected"], self.June_Cohort["MP14-003"]["absent"])
+		vcf_test.computeParents()
+		self.assertTrue(vcf_test.computeXL(self.vcf_line_with_XL_2), "Compute XL did not recognize that proband has variant")
+
+	def test_compute_XL_false_one_parent(self):
+		vcf_test = vcf(self.June_Cohort["MP14-004"]["index"], self.June_Cohort["MP14-004"]["num_affected"], self.June_Cohort["MP14-004"]["absent"])
+		vcf_test.computeParents()
+		self.assertFalse(vcf_test.computeXL(self.vcf_line_with_XL), "Compute XL did not recognize that probands mom has variant variant only")
+
+	def test_compute_XL_true_one_parent(self):
+		vcf_test = vcf(self.June_Cohort["MP14-004"]["index"], self.June_Cohort["MP14-004"]["num_affected"], self.June_Cohort["MP14-004"]["absent"])
+		vcf_test.computeParents()
+		self.assertTrue(vcf_test.computeXL(self.vcf_line_with_XL_2), "Compute XL did not recognize that proband has variant from mother")
+
+	def test_compute_XL_false_one_parent_inherited_from_dad(self):
+		vcf_test = vcf(self.June_Cohort["MP14-004"]["index"], self.June_Cohort["MP14-004"]["num_affected"], self.mom_absent)
+		vcf_test.computeParents()
+		self.assertFalse(vcf_test.computeXL(self.vcf_line_with_XL_2), "Compute XL did not recognize that proband has variant from father")
 
 if __name__ == '__main__':
 	unittest.main()

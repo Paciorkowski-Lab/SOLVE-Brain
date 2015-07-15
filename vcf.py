@@ -193,6 +193,7 @@ class vcf:
 			variant, inherited , notPresent = triplet[1], triplet[1], triplet[2]
 
 			return self.isProbands(variant) and (self.isFather(notPresent) and self.isMother(inherited))
+		return False
 
 			# return (variant[self.proband] and\
 			# (not self.absentMother and variant[self.mother]) and\
