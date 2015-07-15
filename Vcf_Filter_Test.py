@@ -59,6 +59,7 @@ class Vcf_Filter_Test(unittest.TestCase):
 	pedigree = ["DN", "AR", "AD", "XL"]
 
 	def setUp(self):
+		pass
 		# print("===================")
 		# print(self.June_Cohort["DB14-029"]["parents"])
 		# print("===================")
@@ -83,108 +84,113 @@ class Vcf_Filter_Test(unittest.TestCase):
 
 	#Test parent computation
 	def test_compute_parents_no_absent(self):
-		for index in range(0, len(self.proband_index_QTB)):
+		for index in range(len(self.proband_index_QTB)):
 			vcf_test = vcf(self.proband_index_QTB[index], self.number_affected_QTB[index], self.no_absent, self.snv_file_QTB, self.indel_file_QTB, self.pedigree[0])
 			vcf_test.parseAbsentParents()
 			self.assertEqual(vcf_test.computeParents(), [self.proband_index_QTB[index] + self.number_affected_QTB[index], self.proband_index_QTB[index] + self.number_affected_QTB[index] + 1])
 
 	def test_compute_parents_no_mother(self):
-		for index in range(0, len(self.proband_index_QTB)):
+		for index in range(len(self.proband_index_QTB)):
 			vcf_test = vcf(self.proband_index_QTB[index], self.number_affected_QTB[index], self.mom_absent, self.snv_file_QTB, self.indel_file_QTB, self.pedigree[0])
 			vcf_test.parseAbsentParents()
 			self.assertEqual(vcf_test.computeParents(), [self.proband_index_QTB[index] + self.number_affected_QTB[index], 0])
 
 	def test_compute_parents_no_father(self):
-		for index in range(0, len(self.proband_index_QTB)):
+		for index in range(len(self.proband_index_QTB)):
 			vcf_test = vcf(self.proband_index_QTB[index], self.number_affected_QTB[index], self.dad_absent, self.snv_file_QTB, self.indel_file_QTB, self.pedigree[0])
 			vcf_test.parseAbsentParents()
 			self.assertEqual(vcf_test.computeParents(), [0, self.proband_index_QTB[index] + self.number_affected_QTB[index]])
 
 	def test_compute_parents_both_absent(self):
-		for index in range(0, len(self.proband_index_QTB)):
+		for index in range(len(self.proband_index_QTB)):
 			vcf_test = vcf(self.proband_index_QTB[index], self.number_affected_QTB[index], self.both_absent, self.snv_file_QTB, self.indel_file_QTB, self.pedigree[0])
 			vcf_test.parseAbsentParents()
 			self.assertEqual(vcf_test.computeParents(), [0, 0])
 
+	# def test_compute_parents_june_cohort(self):
+	# 	for index in range(0, len(self.proband_index_June)):
+	# 		vcf_test = vcf(self.proband_index_June[index], self.number_affected_June[index], self.absent_June[index], self.snv_file_June, self.indel_file_June, self.pedigree[0])
+	# 		vcf_test.parseAbsentParents()
+	# 		self.assertEqual(vcf_test.computeParents(), self.parent_index_June[index], "Parent indecies not computed correctly for June cohort")
+
 	def test_compute_parents_june_cohort(self):
-		for index in range(0, len(self.proband_index_June)):
-			vcf_test = vcf(self.proband_index_June[index], self.number_affected_June[index], self.absent_June[index], self.snv_file_June, self.indel_file_June, self.pedigree[0])
-			vcf_test.parseAbsentParents()
-			self.assertEqual(vcf_test.computeParents(), self.parent_index_June[index], "Parent indecies not computed correctly for June cohort")
+		for proband in self.June_Cohort:
+			vcf_test = vcf(self.June_Cohort[proband]["index"], self.June_Cohort[proband]["num_affected"], self.June_Cohort[proband]["absent"], self.snv_file_June, self.indel_file_June, self.pedigree[0])
+			self.assertEqual(vcf_test.computeParents(), self.June_Cohort[proband]["parents"], "Parent indecies not computed correctly for June cohort")
 
 	#Map return tests
 	def test_map_return_array_length(self):
-		vcf_test = vcf(self.proband_index_June[0], self.number_affected_June[0], self.absent_June[0], self.snv_file_June, self.indel_file_June, self.pedigree[0])
+		vcf_test = vcf(self.June_Cohort["DB14-001"]["index"], self.June_Cohort["DB14-001"]["num_affected"], self.June_Cohort["DB14-001"]["absent"], self.snv_file_June, self.indel_file_June, self.pedigree[0])
 		self.assertEqual(len(vcf_test.mapReturn("0/0", self.map_return_all_ONE_ONE)), 38)
 
 	def test_map_return_all_false(self):
-		vcf_test = vcf(self.proband_index_June[0], self.number_affected_June[0], self.absent_June[0], self.snv_file_June, self.indel_file_June, self.pedigree[0])
+		vcf_test = vcf(self.June_Cohort["DB14-001"]["index"], self.June_Cohort["DB14-001"]["num_affected"], self.June_Cohort["DB14-001"]["absent"], self.snv_file_June, self.indel_file_June, self.pedigree[0])
 		self.assertFalse(all(vcf_test.mapReturn("0/0", self.map_return_all_ONE_ONE)), "Map Return thought a 0/0 existed when it did not")
 
 	def test_map_return_all_true(self):
-		vcf_test = vcf(self.proband_index_June[0], self.number_affected_June[0], self.absent_June[0], self.snv_file_June, self.indel_file_June, self.pedigree[0])
+		vcf_test = vcf(self.June_Cohort["DB14-001"]["index"], self.June_Cohort["DB14-001"]["num_affected"], self.June_Cohort["DB14-001"]["absent"], self.snv_file_June, self.indel_file_June, self.pedigree[0])
 		self.assertTrue(all(vcf_test.mapReturn("1/1", self.map_return_all_ONE_ONE)[24:]), "Map Return thought did not find all to be true searching for 1/1")
 
 	def test_map_return_last_true_only(self):
-		vcf_test = vcf(self.proband_index_June[0], self.number_affected_June[0], self.absent_June[0], self.snv_file_June, self.indel_file_June, self.pedigree[0])
+		vcf_test = vcf(self.June_Cohort["DB14-001"]["index"], self.June_Cohort["DB14-001"]["num_affected"], self.June_Cohort["DB14-001"]["absent"], self.snv_file_June, self.indel_file_June, self.pedigree[0])
 		returned_array = vcf_test.mapReturn("0/1", self.map_return_last_true)
 		self.assertFalse(all(returned_array[24:len(returned_array) - 1]), "Map Return find a 0/1 in a sea of all 0/0")
 		self.assertTrue(returned_array[len(returned_array) - 1:][0], "Map Return did not find the last index to be 0/1")
 
 	#Compute VCF line tests (extension of map return tests, more complex)
 	def test_vcf_line_computation_homo(self):
-		vcf_test = vcf(self.proband_index_June[0], self.number_affected_June[0], self.absent_June[0], self.snv_file_June, self.indel_file_June, self.pedigree[0])
+		vcf_test = vcf(self.June_Cohort["DB14-001"]["index"], self.June_Cohort["DB14-001"]["num_affected"], self.June_Cohort["DB14-001"]["absent"], self.snv_file_June, self.indel_file_June, self.pedigree[0])
 		returned_array = vcf_test.computeVCFLine(self.vcf_line_all_three_cases)[0]
 		self.assertTrue(all([returned_array[24], returned_array[30]]), "Compute VCF lines did not find the homozygous(1/1) cases correctly")
 
 	def test_vcf_line_computation_hetero(self):
-		vcf_test = vcf(self.proband_index_June[0], self.number_affected_June[0], self.absent_June[0], self.snv_file_June, self.indel_file_June, self.pedigree[0])
+		vcf_test = vcf(self.June_Cohort["DB14-001"]["index"], self.June_Cohort["DB14-001"]["num_affected"], self.June_Cohort["DB14-001"]["absent"], self.snv_file_June, self.indel_file_June, self.pedigree[0])
 		returned_array = vcf_test.computeVCFLine(self.vcf_line_all_three_cases)[1]
 		self.assertTrue(all([returned_array[26], returned_array[27], returned_array[28], returned_array[34], returned_array[35], returned_array[36], returned_array[37]]), "Compute VCF lines did not find the absent(0/0) cases correctly")
 
 	def test_vcf_line_computation_absent(self):
-		vcf_test = vcf(self.proband_index_June[0], self.number_affected_June[0], self.absent_June[0], self.snv_file_June, self.indel_file_June, self.pedigree[0])
+		vcf_test = vcf(self.June_Cohort["DB14-001"]["index"], self.June_Cohort["DB14-001"]["num_affected"], self.June_Cohort["DB14-001"]["absent"], self.snv_file_June, self.indel_file_June, self.pedigree[0])
 		returned_array = vcf_test.computeVCFLine(self.vcf_line_all_three_cases)[2]
 		self.assertTrue(all([returned_array[25], returned_array[29], returned_array[31], returned_array[32], returned_array[33]]), "Compute VCF lines did not find the heterozygous(0/1) cases correctly")
 
 	#ComputeDN testing, trying all cases
 	def test_compute_DN_false_both_parents(self):
-		vcf_test = vcf(self.proband_index_June[0], self.number_affected_June[0], self.absent_June[0], self.snv_file_June, self.indel_file_June, self.pedigree[0])
+		vcf_test = vcf(self.June_Cohort["DB14-001"]["index"], self.June_Cohort["DB14-001"]["num_affected"], self.June_Cohort["DB14-001"]["absent"], self.snv_file_June, self.indel_file_June, self.pedigree[0])
 		vcf_test.computeParents()
 		self.assertFalse(vcf_test.computeDN(self.vcf_line_with_DN_3), "Compute DN thought first proband had a DN variant. (actually the second proband does)")
 
 	def test_compute_DN_true_both_parents(self):
-		vcf_test = vcf(self.proband_index_June[1], self.number_affected_June[1], self.absent_June[1], self.snv_file_June, self.indel_file_June, self.pedigree[0])
+		vcf_test = vcf(self.June_Cohort["DB14-029"]["index"], self.June_Cohort["DB14-029"]["num_affected"], self.June_Cohort["DB14-029"]["absent"], self.snv_file_June, self.indel_file_June, self.pedigree[0])
 		vcf_test.computeParents()
 		self.assertTrue(vcf_test.computeDN(self.vcf_line_with_DN_2), "Compute DN did not find the second proband to have a DN variant")
 
 	def test_compute_DN_false_multiAffected_both_parents(self):
-		vcf_test = vcf(self.proband_index_June[0], self.number_affected_June[0], self.absent_June[0], self.snv_file_June, self.indel_file_June, self.pedigree[0])
+		vcf_test = vcf(self.June_Cohort["DB14-001"]["index"], self.June_Cohort["DB14-001"]["num_affected"], self.June_Cohort["DB14-001"]["absent"], self.snv_file_June, self.indel_file_June, self.pedigree[0])
 		vcf_test.computeParents()
 		self.assertFalse(vcf_test.computeDN(self.vcf_line_with_DN_2), "Compute DN thought first proband had a DN variant. (but sibling does not contain variant)")
 
 	def test_compute_DN_true_multiAffected_both_parents(self):
-		vcf_test = vcf(self.proband_index_June[0], self.number_affected_June[0], self.absent_June[0], self.snv_file_June, self.indel_file_June, self.pedigree[0])
+		vcf_test = vcf(self.June_Cohort["DB14-001"]["index"], self.June_Cohort["DB14-001"]["num_affected"], self.June_Cohort["DB14-001"]["absent"], self.snv_file_June, self.indel_file_June, self.pedigree[0])
 		vcf_test.computeParents()
 		self.assertTrue(vcf_test.computeDN(self.vcf_line_with_DN_4), "Compute DN thought siblings did not both have DN variant")
 
 	def test_compute_DN_false_no_parents(self):
-		vcf_test = vcf(self.proband_index_June[3], self.number_affected_June[3], self.absent_June[3], self.snv_file_June, self.indel_file_June, self.pedigree[0])
+		vcf_test = vcf(self.June_Cohort["MP14-003"]["index"], self.June_Cohort["MP14-003"]["num_affected"], self.June_Cohort["MP14-003"]["absent"], self.snv_file_June, self.indel_file_June, self.pedigree[0])
 		vcf_test.computeParents()
 		self.assertFalse(vcf_test.computeDN(self.vcf_line_with_DN), "Compute DN did not recognize that proband has 'DN' mutation without parents")
 
 	def test_compute_DN_true_no_parents(self):
-		vcf_test = vcf(self.proband_index_June[3], self.number_affected_June[3], self.absent_June[3], self.snv_file_June, self.indel_file_June, self.pedigree[0])
+		vcf_test = vcf(self.June_Cohort["MP14-003"]["index"], self.June_Cohort["MP14-003"]["num_affected"], self.June_Cohort["MP14-003"]["absent"], self.snv_file_June, self.indel_file_June, self.pedigree[0])
 		vcf_test.computeParents()
 		self.assertTrue(vcf_test.computeDN(self.vcf_line_with_DN_2), "Compute DN did not recognize that proband has 'DN' mutation without parents")
 
 	def test_compute_DN_false_one_parent(self):
-		vcf_test = vcf(self.proband_index_June[4], self.number_affected_June[4], self.absent_June[4], self.snv_file_June, self.indel_file_June, self.pedigree[0])
+		vcf_test = vcf(self.June_Cohort["MP14-004"]["index"], self.June_Cohort["MP14-004"]["num_affected"], self.June_Cohort["MP14-004"]["absent"], self.snv_file_June, self.indel_file_June, self.pedigree[0])
 		vcf_test.computeParents()
 		self.assertFalse(vcf_test.computeDN(self.vcf_line_with_DN_2), "Compute DN did not recognize that probands mother also has variant")
 
 	def test_compute_DN_true_one_parent(self):
-		vcf_test = vcf(self.proband_index_June[4], self.number_affected_June[4], self.absent_June[4], self.snv_file_June, self.indel_file_June, self.pedigree[0])
+		vcf_test = vcf(self.June_Cohort["MP14-004"]["index"], self.June_Cohort["MP14-004"]["num_affected"], self.June_Cohort["MP14-004"]["absent"], self.snv_file_June, self.indel_file_June, self.pedigree[0])
 		vcf_test.computeParents()
 		self.assertTrue(vcf_test.computeDN(self.vcf_line_with_DN_3), "Compute DN did not recognize that probands mother does not have variant")
 
