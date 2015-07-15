@@ -1,4 +1,4 @@
-#Author: @imyjimmy
+#Author: @imyjimmy, @fjames003
 import logging, sys, getopt, re
 	
 class vcf: 
