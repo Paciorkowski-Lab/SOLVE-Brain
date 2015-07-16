@@ -210,20 +210,31 @@ class vcf:
 			for line in self.filein:
 				if self.computeXL(line):
 					self.fileout.write(line)
+		#slightly diff scenario for CH due to comparisons on a gene to gene basis
+		#rather than a line basis
+		elif pedigree == 'CH':
+			#maybe what needs to be done
+			self.computeCompoundHet(self.filein, self.fileout)
 	
 	def buildGeneHash(self, filein = None):
+		geneHash = {}
 		if filein != None:
 			self.filein = open(filein, 'r')
 
 		for line in self.filein:
 			l = line.split();
-			if l[6] in self.geneHash:
-				self.geneHash[l[6]][l[1]] = line
+			geneName = l[6]
+			key = ''.join(l[1:5])
+			if geneName in self.geneHash:
+				geneHash[geneName][key] = line
 			else:
 				variant = {}
-				variant[l[1]] = line
-				self.geneHash[l[6]] = variant
+				variant[key] = line
+				geneHash[geneName] = variant
+		#not esoteric debate: the pros and cons of self.geneHash vs returning a geneHash
+		return geneHash
 
+	#whether self.geneHash is a thing or not will greatly affect this.
 	def printGeneHash(self):
 		for gene in self.geneHash:
 			print len(self.geneHash[gene])
@@ -231,39 +242,52 @@ class vcf:
 				print self.geneHash[gene][var]
 
 	#still in progress
-	def computeCompoundHet(self):
-		outfile = open('CH_out_1-1_strict_attempt2.txt', 'w')
+#should return true, fase..?
+	def computeCompoundHet(self, filein=None, fileout=None):
+		#outfile = open('CH_out_1-1_strict_attempt2.txt', 'w')
+		geneHash = self.buildGeneHash(filein)
+		for gene in geneHash: #iterates over keys
+			if isGeneCH(geneHash[gene])
+				#some way to out to file. i know. use a method that doesnt exist yet
+				writeHash(fileout, geneHash[gene])
+	#in this method, we are looking at variants of this particular gene
+	def isGeneCH(self, variantHash): #geneHash[gene] returns a hash of variants for that gene. I know.
 		compHet = {}
+		
+		if len(variantHash) >= 2:
+			for variantKey in variantHash:
+				variantLine = variantHash[variantKey]
+					#proband = self.probandOffset(variantLine, 11) #super hard-coded for now
+					
+				triplet = self.computeVCFLine(variantLine)
+				hetero, inherited = triplet['hetero'], triplet['hetero']
 
-		for gene in self.geneHash:
-			if len(self.geneHash[gene]) >= 2:
-				prevVariant = None;
-				for v in self.geneHash[gene]:
-					variantLine = self.geneHash[gene][v]
-					proband = self.probandOffset(variantLine, 11) #super hard-coded for now
-					
-					#the following makes the next if statement go out of bounds. but is a good idea.
-					#variant = self.mapReturn('0/1', variantLine[self.probandOffset(variantLine):])
-					one_one = self.mapReturn('1/1', variantLine)
-					zero_one = self.mapReturn('0/1', variantLine)
-					
-					#variant = self.mapReturn('1/1', variantLine)
-					#todo: make this better
-					if (one_one[proband] and one_one[proband-3] and one_one[proband-4]): #the proband has this. add to compHet
-						if gene in compHet:
-							compHet[gene][v] = variantLine
+				fromFather = self.isFather(inherited) and not self.absentFather
+				fromMother = self.isMother(inherited) and not self.absentMother
+				if (self.isProbands(hetero) and (fromFather != fromMother):
+					#the proband has this (how to deal w parents) dd to compHet
+					if fromFather and not fromMother:
+						if 'father' in compHet and compHet['father'] is not None:
+							#found another match for father--dont do nothin
+							#or add to an existing hash that keeps track of father-inherited variants
+							compHet['father'][variantKey] = variantLine
 						else:
-							variantHash = {}
-							variantHash[v] = variantLine
-							compHet[gene] = variantHash
+							fatherVariants = {}
+							fatherVariants[variantKey] = variantLine
+							compHet['father'] = fatherVariants
+					elif fromMother and not fromFather:
+						if 'mother' in compHet and compHet['mother'] is not None:
+							#dont do nothin
+						else:
+							motherVariants = {}
+							motherVariants[variantKey] = variantLine
+							compHet['mother'] = motherVariants
+		else: #this variantHash contained fewer than 2 variants (one variant) 
+			#with the exception that we want definitive proof both parents are present
+			return self.computeAR(variantHash[variantHash.keys()[0]]) 
 
-		for gene in compHet:
-			for var in compHet[gene]:
-				if len(compHet[gene]) >= 2:
-					print compHet[gene][var]
-					outfile.write(compHet[gene][var])
-
-		outfile.close()
+		return len(compHet['father']) > 0 and len(compHet['mother']) > 0
+					#outfile.write(compHet[gene][var])
 
 	def filter(self, freq, file=None):
 		pass
