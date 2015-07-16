@@ -3,23 +3,6 @@ import logging, sys, getopt, re
 	
 class vcf: 
 	
-	# def __init__(self):
-	# 	self.num_affected = '' 
-	# 	self.proband = ''
-	# 	self.absent = ''
-	# 	self.absentMother = ''
-	# 	self.absentFather = ''
-	# 	self.mother = 0
-	# 	self.father = 0
-	# 	self.snv = ''
-	# 	self.indel = ''
-	# 	self.pedigree = ''
-	# 	self.output = ''
-	# 	self.num_affected = ''
-	# 	self.idOffset = 0; #do computations on id's which are not first
-	# 	self.filein = None;
-	# 	self.fileout = None; 
-	
 	def __init__(self, proband_index = None, num_affected = None, absent = None, snv = None, indel = None, pedigree = None, output = None):
 		self.proband = proband_index
 		self.num_affected = num_affected
