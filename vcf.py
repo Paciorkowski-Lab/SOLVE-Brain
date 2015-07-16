@@ -19,7 +19,8 @@ class vcf:
 		self.idOffset = None
 		self.filein = None
 		self.fileout = None
-		self.false_array = [False for skipped in range(self.proband)]             
+		if self.proband != None:
+			self.false_array = [False for skipped in range(self.proband)]             
 		#build gene dict
 		self.geneHash = {}
 			
@@ -79,18 +80,20 @@ class vcf:
 
 		#added for testing
 		return [self.absentFather, self.absentMother]
-	
+
+	def computeFam(self, searchStr, line):
+		family = self.mapSearch(searchStr, line.split('\t')[self.proband:(self.proband + self.num_affected + self.parent_num)])
+		return self.false_array + family
+
 	#returns an array of [True, False, False, True, etc]
 	#could be used to hard filter out exonic vs non-
-	def mapReturn(self,searchStr,line):
-		print('mapReturn(searchStr, line):')
-		print('\tsearchStr: ' + searchStr + ' line: ' + line)
-		v = map(lambda x: re.search(searchStr, x) != None, line.split('\t')[self.proband:(self.proband + self.num_affected + self.parent_num)])       
+	def mapSearch(self,searchStr,arr):
+		print('mapSearch(searchStr, arr):')
+		#print('\tsearchStr: ' + searchStr + ' arr: ' + arr)
+		v = map(lambda x: re.search(searchStr, x) != None, arr)       
 		#v = map(lambda x: re.search(searchStr, x) != None, line.split('\t')[self.proband:])       
-		print('v: ' + str(self.false_array + v))                                                  
-	#	variant = map(lambda x: x != None, v)
-	#	print('variant: ' + str(variant))
-		return self.false_array + v                                                               
+		print('v: ' + str(v))                                                  
+		return v                                                               
 	
 	#detects the proband offset for the current line.
 	#could use a general method, compute all offsets.
@@ -99,7 +102,7 @@ class vcf:
 	# 		self.idOffset = offset
 
 	# 	print('probandOffset:')
-	# 	arrIndex = self.mapReturn('GT:AD:DP:GQ:PL', line)
+	# 	arrIndex = self.mapSearch('GT:AD:DP:GQ:PL', line)
 	# 	index = 0 #index('')
 	# 	for i in arrIndex:
 	# 		index = 1+index
@@ -124,9 +127,9 @@ class vcf:
 
 	#you can pass in a built in flag if you want
 	def computeVCFLine(self, line): #filein = None, fileout = None
-		homo = self.mapReturn('1/1', line)
-		hetero = self.mapReturn('0/1', line)
-		absent = self.mapReturn('0/0', line)
+		homo = self.computeFam('1/1', line)
+		hetero = self.computeFam('0/1', line)
+		absent = self.computeFam('0/0', line)
 		return {"homo": homo, "hetero": hetero, "absent": absent}          
 		#return (homo, hetero, absent)
 	
@@ -152,12 +155,6 @@ class vcf:
 			return self.isProbands(variant)
 		else:
 			return self.isProbands(variant) and ((self.isFather(inherited) != self.absentFather) != (self.isMother(inherited) != self.absentMother))
-		
-		# return ((variant[self.proband] and\
-		# ((not self.absentFather and inherited[self.father])  or self.absentFather) and\
-		# ((not self.absentMother and notPresent[self.mother])  or self.absentMother)) or\
-		# (variant[self.proband] and ((not self.absentMother and\
-		# inherited[self.mother])  or self.absentMother) and ((not self.absentFather and notPresent[self.father])  or self.absentFather)))
 	
 	def computeDN(self, line):
 		triplet = self.computeVCFLine(line)
@@ -165,11 +162,8 @@ class vcf:
 		
 		return self.isProbands(variant) and (self.isFather(notPresent) and self.isMother(notPresent))
 
-		# return (variant[self.proband] and ((not self.absentFather and notPresent[self.father]) or self.absentFather) and\
-		# (not self.absentMother and notPresent[self.mother] or self.absentMother))
-	
 	def computeXL(self, line):
-		#xChrom = self.mapReturn('X', line)             
+		#xChrom = self.mapSearch('X', line)             
 		#if xChrom[0]: #X chromosome                    
 		if re.search("X", line[:1]) != None:            
 			triplet = self.computeVCFLine(line)
@@ -177,10 +171,6 @@ class vcf:
 
 			return self.isProbands(variant) and (self.isFather(notPresent) and self.isMother(inherited))
 		return False
-
-			# return (variant[self.proband] and\
-			# (not self.absentMother and variant[self.mother]) and\
-			# (not self.absentFather and notPresent[self.father]))
 	
 #could potentially makes this more of a "standalone" method
 	#in that case probandOffset, offsets are needed
@@ -216,9 +206,9 @@ class vcf:
 			self.filein = open(filein, 'r')
 
 		for line in self.filein:
-			l = line.split();
+			l = line.split('\t');
 			if l[6] in self.geneHash:
-				self.geneHash[l[6]][l[1]] = line
+				self.geneHash[l[6]][l[1]+":"+l[2]] = line
 			else:
 				variant = {}
 				variant[l[1]] = line
@@ -228,7 +218,8 @@ class vcf:
 		for gene in self.geneHash:
 			print len(self.geneHash[gene])
 			for var in self.geneHash[gene]:
-				print self.geneHash[gene][var]
+				if len(self.geneHash[gene]) >= 2:
+					print self.geneHash[gene][var]
 
 	#still in progress
 	def computeCompoundHet(self):
@@ -243,11 +234,11 @@ class vcf:
 					proband = self.probandOffset(variantLine, 11) #super hard-coded for now
 					
 					#the following makes the next if statement go out of bounds. but is a good idea.
-					#variant = self.mapReturn('0/1', variantLine[self.probandOffset(variantLine):])
-					one_one = self.mapReturn('1/1', variantLine)
-					zero_one = self.mapReturn('0/1', variantLine)
+					#variant = self.mapSearch('0/1', variantLine[self.probandOffset(variantLine):])
+					one_one = self.mapSearch('1/1', variantLine)
+					zero_one = self.mapSearch('0/1', variantLine)
 					
-					#variant = self.mapReturn('1/1', variantLine)
+					#variant = self.mapSearch('1/1', variantLine)
 					#todo: make this better
 					if (one_one[proband] and one_one[proband-3] and one_one[proband-4]): #the proband has this. add to compHet
 						if gene in compHet:
