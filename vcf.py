@@ -144,17 +144,17 @@ class vcf:
 		homo = self.mapReturn('1/1', line)
 		hetero = self.mapReturn('0/1', line)
 		absent = self.mapReturn('0/0', line)
-		#return {"homozygous": homo, "heterozygous": hetero, "absent": absent}          
-		return (homo, hetero, absent)
+		return {"homo": homo, "hetero": hetero, "absent": absent}          
+		#return (homo, hetero, absent)
 	
 	def computeAR(self, line):
 		triplet = self.computeVCFLine(line)
 		#variant, inherited = triplet["homozygous"], triplet["heterozygous"]            
-		variant, inherited = triplet[0], triplet[1]
+		variant, inherited = triplet['homo'], triplet['hetero']
 
 		#call perl for CH aspect...
 		
-		return self.isProbands(variant) and (self.isFather(inherited) and self.isMother(inherited))
+		return self.isProbands(variant) and (self.isFather(inherited)  and self.isMother(inherited))
 
 		# return (variant[self.proband] and\
 		# (not self.absentMother and inherited[self.mother]) and\
@@ -162,7 +162,7 @@ class vcf:
 
 	def computeAD(self, line):
 		triplet = self.computeVCFLine(line)
-		variant, inherited, notPresent = triplet[1], triplet[1], triplet[2]
+		variant, inherited, notPresent = triplet['hetero'], triplet['hetero'], triplet['absent']
 
 		#return self.isProbands(variant) and (self.isFather(inherited) != self.isMother(inherited))
 		if self.absentFather and self.absentMother:
@@ -178,7 +178,7 @@ class vcf:
 	
 	def computeDN(self, line):
 		triplet = self.computeVCFLine(line)
-		variant, inherited, notPresent = triplet[1], triplet[1], triplet[2]
+		variant, inherited, notPresent = triplet['hetero'], triplet['hetero'], triplet['absent']
 		
 		return self.isProbands(variant) and (self.isFather(notPresent) and self.isMother(notPresent))
 
@@ -190,7 +190,7 @@ class vcf:
 		#if xChrom[0]: #X chromosome                    
 		if re.search("X", line[:1]) != None:            
 			triplet = self.computeVCFLine(line)
-			variant, inherited , notPresent = triplet[1], triplet[1], triplet[2]
+			variant, inherited , notPresent = triplet['hetero'], triplet['hetero'], triplet['absent']
 
 			return self.isProbands(variant) and (self.isFather(notPresent) and self.isMother(inherited))
 		return False
