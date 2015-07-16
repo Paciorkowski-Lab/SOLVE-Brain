@@ -118,12 +118,6 @@ class Vcf_Filter_Test(unittest.TestCase):
 			vcf_test.parseAbsentParents()
 			self.assertEqual(vcf_test.computeParents(), [0, 0])
 
-	# def test_compute_parents_june_cohort(self):
-	# 	for index in range(0, len(self.proband_index_June)):
-	# 		vcf_test = vcf(self.proband_index_June[index], self.number_affected_June[index], self.absent_June[index], self.snv_file_June, self.indel_file_June, self.pedigree[0])
-	# 		vcf_test.parseAbsentParents()
-	# 		self.assertEqual(vcf_test.computeParents(), self.parent_index_June[index], "Parent indecies not computed correctly for June cohort")
-
 	def test_compute_parents_june_cohort(self):
 		for proband in self.June_Cohort:
 			vcf_test = vcf(self.June_Cohort[proband]["index"], self.June_Cohort[proband]["num_affected"], self.June_Cohort[proband]["absent"])
@@ -133,22 +127,22 @@ class Vcf_Filter_Test(unittest.TestCase):
 	def test_map_return_array_length(self):
 		vcf_test = vcf(self.June_Cohort["DB14-001"]["index"], self.entire_cohort, self.June_Cohort["DB14-001"]["absent"])
 		vcf_test.computeParents()
-		self.assertEqual(len(vcf_test.mapReturn("0/0", self.map_return_all_ONE_ONE)), 38)
+		self.assertEqual(len(vcf_test.mapSearch("0/0", self.map_return_all_ONE_ONE.split('\t'))), 38)
 
 	def test_map_return_all_false(self):
 		vcf_test = vcf(self.June_Cohort["DB14-001"]["index"], self.entire_cohort, self.June_Cohort["DB14-001"]["absent"])
 		vcf_test.computeParents()
-		self.assertFalse(all(vcf_test.mapReturn("0/0", self.map_return_all_ONE_ONE)), "Map Return thought a 0/0 existed when it did not")
+		self.assertFalse(all(vcf_test.mapSearch("0/0", self.map_return_all_ONE_ONE.split('\t'))), "Map Return thought a 0/0 existed when it did not")
 
 	def test_map_return_all_true(self):
 		vcf_test = vcf(self.June_Cohort["DB14-001"]["index"], self.entire_cohort, self.June_Cohort["DB14-001"]["absent"])
 		vcf_test.computeParents()
-		self.assertTrue(all(vcf_test.mapReturn("1/1", self.map_return_all_ONE_ONE)[24:]), "Map Return thought did not find all to be true searching for 1/1")
+		self.assertTrue(all(vcf_test.mapSearch("1/1", self.map_return_all_ONE_ONE.split('\t'))[24:]), "Map Return thought did not find all to be true searching for 1/1")
 
 	def test_map_return_last_true_only(self):
 		vcf_test = vcf(self.June_Cohort["DB14-001"]["index"], self.entire_cohort, self.June_Cohort["DB14-001"]["absent"])
 		vcf_test.computeParents()
-		returned_array = vcf_test.mapReturn("0/1", self.map_return_last_true)
+		returned_array = vcf_test.mapSearch("0/1", self.map_return_last_true.split('\t'))
 		self.assertFalse(all(returned_array[24:len(returned_array) - 1]), "Map Return find a 0/1 in a sea of all 0/0")
 		self.assertTrue(returned_array[len(returned_array) - 1:][0], "Map Return did not find the last index to be 0/1")
 
@@ -156,19 +150,19 @@ class Vcf_Filter_Test(unittest.TestCase):
 	def test_vcf_line_computation_homo(self):
 		vcf_test = vcf(self.June_Cohort["DB14-001"]["index"], self.entire_cohort, self.June_Cohort["DB14-001"]["absent"])
 		vcf_test.computeParents()
-		returned_array = vcf_test.computeVCFLine(self.vcf_line_all_three_cases)[0]
+		returned_array = vcf_test.computeVCFLine(self.vcf_line_all_three_cases)['homo']
 		self.assertTrue(all([returned_array[24], returned_array[30]]), "Compute VCF lines did not find the homozygous(1/1) cases correctly")
 
 	def test_vcf_line_computation_hetero(self):
 		vcf_test = vcf(self.June_Cohort["DB14-001"]["index"], self.entire_cohort, self.June_Cohort["DB14-001"]["absent"])
 		vcf_test.computeParents()
-		returned_array = vcf_test.computeVCFLine(self.vcf_line_all_three_cases)[1]
+		returned_array = vcf_test.computeVCFLine(self.vcf_line_all_three_cases)['hetero']
 		self.assertTrue(all([returned_array[26], returned_array[27], returned_array[28], returned_array[34], returned_array[35], returned_array[36], returned_array[37]]), "Compute VCF lines did not find the absent(0/0) cases correctly")
 
 	def test_vcf_line_computation_absent(self):
 		vcf_test = vcf(self.June_Cohort["DB14-001"]["index"], self.entire_cohort, self.June_Cohort["DB14-001"]["absent"])
 		vcf_test.computeParents()
-		returned_array = vcf_test.computeVCFLine(self.vcf_line_all_three_cases)[2]
+		returned_array = vcf_test.computeVCFLine(self.vcf_line_all_three_cases)['absent']
 		self.assertTrue(all([returned_array[25], returned_array[29], returned_array[31], returned_array[32], returned_array[33]]), "Compute VCF lines did not find the heterozygous(0/1) cases correctly")
 
 	#ComputeDN testing, trying all cases
