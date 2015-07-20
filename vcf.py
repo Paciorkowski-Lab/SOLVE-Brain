@@ -188,6 +188,10 @@ class vcf:
 			for line in self.filein:
 				if self.computeAR(line):
 					self.fileout.write(line)
+
+			#slightly diff scenario for CH due to comparisons on a gene to gene basis
+			#rather than a line basis
+			self.computeCompoundHet(self.filein, self.fileout)
 		elif self.pedigree == 'AD':
 			for line in self.filein:
 				if self.computeAD(line):
@@ -200,12 +204,7 @@ class vcf:
 			for line in self.filein:
 				if self.computeXL(line):
 					self.fileout.write(line)
-		#slightly diff scenario for CH due to comparisons on a gene to gene basis
-		#rather than a line basis
-		elif pedigree == 'CH':
-			#maybe what needs to be done
-			self.computeCompoundHet(self.filein, self.fileout)
-	
+
 	def buildGeneHash(self, filein = None):
 		geneHash = {}
 		if filein != None:

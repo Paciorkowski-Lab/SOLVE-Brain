@@ -23,6 +23,10 @@ class Vcf_Filter_Test(unittest.TestCase):
 	vcf_line_with_XL = "X\t12725701\t12725701\tC\tG\texonic\tFRMPD4\tsynonymous SNV\tFRMPD4:NM_014728:exon13:c.C1401G:p.V467V\tScore=617;Name=lod=431\tNA\trs6641078\tNA\tNA\tNA\tX\t12725701\t.\tC\tG\t1610.84\t.\tAC=3;AF=0.107;AN=28;BaseQRankSum=-3.730;DP=384;Dels=0.00;FS=5.291;HaplotypeScore=0.4845;InbreedingCoeff=-0.1200;MLEAC=3;MLEAF=0.107;MQ=59.32;MQ0=1;MQRankSum=-0.152;QD=13.10;ReadPosRankSum=-0.116\tGT:AD:DP:GQ:PL\t0/1:17,24:41:99:613,0,442\t0/0:21,0:21:48:0,48,618\t0/0:25,0:25:66:0,66,812\t0/1:25,29:54:99:724,0,696\t0/1:22,0:22:54:0,54,676\t0/0:25,0:25:54:0,54,700\t0/0:32,0:32:78:0,78,981\t0/1:14,0:14:36:0,36,441\t0/1:23,0:23:60:0,60,732\t0/0:18,0:18:39:0,39,506\t0/1:32,0:32:75:0,75,946\t0/0:15,0:15:42:0,42,496\t0/0:34,0:34:87:0,87,1077\t0/1:15,13:28:99:324,0,398"
 	#MP14-001 inherited from dad not mom, 003 present, XL for 004, DB14-001 siblings have DN, XL for 029
 	vcf_line_with_XL_2 = "X\t12725701\t12725701\tC\tG\texonic\tFRMPD4\tsynonymous SNV\tFRMPD4:NM_014728:exon13:c.C1401G:p.V467V\tScore=617;Name=lod=431\tNA\trs6641078\tNA\tNA\tNA\tX\t12725701\t.\tC\tG\t1610.84\t.\tAC=3;AF=0.107;AN=28;BaseQRankSum=-3.730;DP=384;Dels=0.00;FS=5.291;HaplotypeScore=0.4845;InbreedingCoeff=-0.1200;MLEAC=3;MLEAF=0.107;MQ=59.32;MQ0=1;MQRankSum=-0.152;QD=13.10;ReadPosRankSum=-0.116\tGT:AD:DP:GQ:PL\t0/1:17,24:41:99:613,0,442\t0/1:21,0:21:48:0,48,618\t0/0:25,0:25:66:0,66,812\t0/0:25,29:54:99:724,0,696\t0/1:22,0:22:54:0,54,676\t0/0:25,0:25:54:0,54,700\t0/1:32,0:32:78:0,78,981\t0/1:14,0:14:36:0,36,441\t0/1:23,0:23:60:0,60,732\t0/1:18,0:18:39:0,39,506\t0/0:32,0:32:75:0,75,946\t0/1:15,0:15:42:0,42,496\t0/1:34,0:34:87:0,87,1077\t0/1:15,13:28:99:324,0,398"	
+	#DB14-001 parents have 1/1, 029 is HM, MP14-001 sibling is not HM, 003 is HM, 004 is not HM because mother is 1/1
+	vcf_line_with_AR_HM = "1\t877831\t877831\tT\tC\texonic\tSAMD11\tnonsynonymous SNV\tSAMD11:NM_152486:exon10:c.T1027C:p.W343R\tScore=559;Name=lod=249\tNA\trs6672356\tNA\tNA\tNA\t1\t877831\t.\tT\tC \t2813.08\t.\tAC=28;AF=1.00;AN=28;DP=100;Dels=0.00;FS=0.000;HaplotypeScore=0.0702;InbreedingCoeff=-0.0129;MLEAC=28;MLEAF=1.00;MQ=59.81;MQ0=0;QD=28.13\tGT:AD:DP:GQ:PL\t1/1:0,7:7:18:198,18,0\t1/1:0,11:11:33:349,33,0\t1/1:0,10:10:27:285,27,0\t1/1:0,5:5:15:147,15,0\t1/1:0,4:4:9:108,9,0\t0/1:0,7:7:15:185,15,0\t0/1:0,7:7:21:222,21,0\t1/1:0,5:5:15:154,15,0\t0/1:0,6:6:15:176,15,0\t0/1:0,8:8:15:177,15,0\t0/1:0,7:7:15:181,15,0\t1/1:0,7:7:18:202,18,0\t1/1:0,8:8:24:250,24,0\t1/1:0,8:8:18:203,18,0"
+	#DB14-001 is HM with sibling, 029 is only 0/1, 003 is only 0/1 and 004 is HM
+	vcf_line_with_AR_HM_2 = "1\t877831\t877831\tT\tC\texonic\tSAMD11\tnonsynonymous SNV\tSAMD11:NM_152486:exon10:c.T1027C:p.W343R\tScore=559;Name=lod=249\tNA\trs6672356\tNA\tNA\tNA\t1\t877831\t.\tT\tC \t2813.08\t.\tAC=28;AF=1.00;AN=28;DP=100;Dels=0.00;FS=0.000;HaplotypeScore=0.0702;InbreedingCoeff=-0.0129;MLEAC=28;MLEAF=1.00;MQ=59.81;MQ0=0;QD=28.13\tGT:AD:DP:GQ:PL\t1/1:0,7:7:18:198,18,0\t1/1:0,11:11:33:349,33,0\t0/1:0,10:10:27:285,27,0\t0/1:0,5:5:15:147,15,0\t0/1:0,4:4:9:108,9,0\t0/1:0,7:7:15:185,15,0\t0/1:0,7:7:21:222,21,0\t1/1:0,5:5:15:154,15,0\t0/1:0,6:6:15:176,15,0\t0/1:0,8:8:15:177,15,0\t0/1:0,7:7:15:181,15,0\t0/1:0,7:7:18:202,18,0\t1/1:0,8:8:24:250,24,0\t0/1:0,8:8:18:203,18,0"
 	proband_index_QTB  = [24, 27, 30, 33, 36, 39, 42]
 	proband_index_June = [24, 28, 31, 35, 36]
 	June_Cohort = {
@@ -303,6 +307,50 @@ class Vcf_Filter_Test(unittest.TestCase):
 		vcf_test = vcf(self.June_Cohort["MP14-004"]["index"], self.June_Cohort["MP14-004"]["num_affected"], self.mom_absent)
 		vcf_test.computeParents()
 		self.assertFalse(vcf_test.computeXL(self.vcf_line_with_XL_2), "Compute XL did not recognize that proband has variant from father")
+
+	# ComputeAR testing, homozygous cases...
+	def test_compute_AR_HM_false_both_parents(self):
+		vcf_test = vcf(self.June_Cohort["DB14-029"]["index"], self.June_Cohort["DB14-029"]["num_affected"], self.June_Cohort["DB14-029"]["absent"])
+		vcf_test.computeParents()
+		self.assertFalse(vcf_test.computeAR(self.vcf_line_with_AR_HM_2), "This found a 0/1 variant to be HM...")
+
+	def test_compute_AR_HM_true_both_parents(self):
+		vcf_test = vcf(self.June_Cohort["DB14-029"]["index"], self.June_Cohort["DB14-029"]["num_affected"], self.June_Cohort["DB14-029"]["absent"])
+		vcf_test.computeParents()
+		self.assertTrue(vcf_test.computeAR(self.vcf_line_with_AR_HM), "This did not find a single affected child to be AR-HM")
+
+	def test_compute_AR_HM_false_multiAffected_both_parents(self):
+		vcf_test = vcf(self.June_Cohort["DB14-001"]["index"], self.June_Cohort["DB14-001"]["num_affected"], self.June_Cohort["DB14-001"]["absent"])
+		vcf_test_2 = vcf(self.June_Cohort["MP14-001"]["index"], self.June_Cohort["MP14-001"]["num_affected"], self.June_Cohort["MP14-001"]["absent"])
+		vcf_test.computeParents()
+		vcf_test_2.computeParents()
+		self.assertFalse(vcf_test.computeAR(self.vcf_line_with_AR_HM), "Did not realize parents are both 1/1 as well")
+		self.assertFalse(vcf_test_2.computeAR(self.vcf_line_with_AR_HM), "Did not realize that sibling does not possess 1/1 as well")
+
+	def test_compute_AR_HM_true_multiAffected_both_parents(self):
+		vcf_test = vcf(self.June_Cohort["DB14-001"]["index"], self.June_Cohort["DB14-001"]["num_affected"], self.June_Cohort["DB14-001"]["absent"])
+		vcf_test.computeParents()
+		self.assertTrue(vcf_test.computeAR(self.vcf_line_with_AR_HM_2), "Did not find both sibling to have 1/1 inherited from parents")
+
+	def test_compute_AR_HM_false_no_parents(self):
+		vcf_test = vcf(self.June_Cohort["MP14-003"]["index"], self.June_Cohort["MP14-003"]["num_affected"], self.June_Cohort["MP14-003"]["absent"])
+		vcf_test.computeParents()
+		self.assertFalse(vcf_test.computeAR(self.vcf_line_with_AR_HM_2), "Did not realize proband is only heterozygous")
+
+	def test_compute_AR_HM_true_no_parents(self):
+		vcf_test = vcf(self.June_Cohort["MP14-003"]["index"], self.June_Cohort["MP14-003"]["num_affected"], self.June_Cohort["MP14-003"]["absent"])
+		vcf_test.computeParents()
+		self.assertTrue(vcf_test.computeAR(self.vcf_line_with_AR_HM), "Did not find proband to be 1/1 without any parents")
+
+	def test_compute_AR_HM_false_DN_one_parent(self):
+		vcf_test = vcf(self.June_Cohort["MP14-004"]["index"], self.June_Cohort["MP14-004"]["num_affected"], self.June_Cohort["MP14-004"]["absent"])
+		vcf_test.computeParents()
+		self.assertFalse(vcf_test.computeAR(self.vcf_line_with_AR_HM), "Probands sinlge parent is also 1/1")
+
+	def test_compute_AR_HM_true_one_parent(self):
+		vcf_test = vcf(self.June_Cohort["MP14-004"]["index"], self.June_Cohort["MP14-004"]["num_affected"], self.June_Cohort["MP14-004"]["absent"])
+		vcf_test.computeParents()
+		self.assertTrue(vcf_test.computeAR(self.vcf_line_with_AR_HM_2), "Proband and single parent fit for HM")
 
 if __name__ == '__main__':
 	unittest.main()
