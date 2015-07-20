@@ -53,7 +53,6 @@ class vcf:
 	#father, mother indices are set in relation to proband
 	def computeParents(self):
 		self.parseAbsentParents()
-		print('computeParents():' )
 		if not self.absentFather:
 			self.father = self.proband + int(self.num_affected)
 			self.parent_num += 1                                                  
@@ -63,20 +62,14 @@ class vcf:
 			else:
 				self.mother = self.proband + int(self.num_affected)
 			self.parent_num += 1                                                  
-		print('\tproband: ' + str(self.proband))
-		print('\tfather: ' + str(self.father))
-		print('\tmother: ' + str(self.mother))
 
 		#added for testing
 		return [self.father, self.mother]
 	 
 	#parse absent parents.
 	def parseAbsentParents(self):
-		print('parseAbsentParents(): ')
 		self.absentFather = re.search('F', self.absent) != None
 		self.absentMother = re.search('M', self.absent) != None
-		print('\tabsentMother: ' + str(self.absentMother))
-		print('\tabsentFather: ' + str(self.absentFather))
 
 		#added for testing
 		return [self.absentFather, self.absentMother]
@@ -88,11 +81,8 @@ class vcf:
 	#returns an array of [True, False, False, True, etc]
 	#could be used to hard filter out exonic vs non-
 	def mapSearch(self,searchStr,arr):
-		print('mapSearch(searchStr, arr):')
-		#print('\tsearchStr: ' + searchStr + ' arr: ' + arr)
 		v = map(lambda x: re.search(searchStr, x) != None, arr)       
-		#v = map(lambda x: re.search(searchStr, x) != None, line.split('\t')[self.proband:])       
-		print('v: ' + str(v))                                                  
+		#v = map(lambda x: re.search(searchStr, x) != None, line.split('\t')[self.proband:])                                                        
 		return v                                                               
 	
 	#detects the proband offset for the current line.
