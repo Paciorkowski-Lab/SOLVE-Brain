@@ -73,12 +73,10 @@ class Vcf_Filter_Test(unittest.TestCase):
 	#to test all people in cohort (need to compute parents for last two to register)
 	entire_cohort = 12
 
-	def setUp(self):
-		pass
-		# print("===================")
-		# print(self.June_Cohort["DB14-029"]["parents"])
-		# print("===================")
-
+	def person_generator(self, person):
+		new_person = vcf(self.June_Cohort[person]["index"], self.June_Cohort[person]["num_affected"], self.June_Cohort[person]["absent"])
+		new_person.computeParents()
+		return new_person
 
 	#Test parent parsing
 	def test_parse_parents_no_absent(self):
@@ -171,136 +169,110 @@ class Vcf_Filter_Test(unittest.TestCase):
 
 	#ComputeDN testing, trying all cases
 	def test_compute_DN_false_both_parents(self):
-		vcf_test = vcf(self.June_Cohort["DB14-001"]["index"], self.June_Cohort["DB14-001"]["num_affected"], self.June_Cohort["DB14-001"]["absent"])
-		vcf_test.computeParents()
+		vcf_test = self.person_generator("DB14-001")
 		self.assertFalse(vcf_test.computeDN(self.vcf_line_with_DN_3), "Compute DN thought first proband had a DN variant. (actually the second proband does)")
 
 	def test_compute_DN_true_both_parents(self):
-		vcf_test = vcf(self.June_Cohort["DB14-029"]["index"], self.June_Cohort["DB14-029"]["num_affected"], self.June_Cohort["DB14-029"]["absent"])
-		vcf_test.computeParents()
+		vcf_test = self.person_generator("DB14-029")
 		self.assertTrue(vcf_test.computeDN(self.vcf_line_with_DN_2), "Compute DN did not find the second proband to have a DN variant")
 
 	def test_compute_DN_false_multiAffected_both_parents(self):
-		vcf_test = vcf(self.June_Cohort["DB14-001"]["index"], self.June_Cohort["DB14-001"]["num_affected"], self.June_Cohort["DB14-001"]["absent"])
-		vcf_test.computeParents()
+		vcf_test = self.person_generator("DB14-001")
 		self.assertFalse(vcf_test.computeDN(self.vcf_line_with_DN_2), "Compute DN thought first proband had a DN variant. (but sibling does not contain variant)")
 
 	def test_compute_DN_true_multiAffected_both_parents(self):
-		vcf_test = vcf(self.June_Cohort["DB14-001"]["index"], self.June_Cohort["DB14-001"]["num_affected"], self.June_Cohort["DB14-001"]["absent"])
-		vcf_test.computeParents()
+		vcf_test = self.person_generator("DB14-001")
 		self.assertTrue(vcf_test.computeDN(self.vcf_line_with_DN_4), "Compute DN thought siblings did not both have DN variant")
 
 	def test_compute_DN_false_no_parents(self):
-		vcf_test = vcf(self.June_Cohort["MP14-003"]["index"], self.June_Cohort["MP14-003"]["num_affected"], self.June_Cohort["MP14-003"]["absent"])
-		vcf_test.computeParents()
+		vcf_test = self.person_generator("MP14-003")
 		self.assertFalse(vcf_test.computeDN(self.vcf_line_with_DN), "Compute DN did not recognize that proband has no variant")
 
 	def test_compute_DN_true_no_parents(self):
-		vcf_test = vcf(self.June_Cohort["MP14-003"]["index"], self.June_Cohort["MP14-003"]["num_affected"], self.June_Cohort["MP14-003"]["absent"])
-		vcf_test.computeParents()
+		vcf_test = self.person_generator("MP14-003")
 		self.assertTrue(vcf_test.computeDN(self.vcf_line_with_DN_2), "Compute DN did not recognize that proband has 'DN' mutation without parents")
 
 	def test_compute_DN_false_one_parent(self):
-		vcf_test = vcf(self.June_Cohort["MP14-004"]["index"], self.June_Cohort["MP14-004"]["num_affected"], self.June_Cohort["MP14-004"]["absent"])
-		vcf_test.computeParents()
+		vcf_test = self.person_generator("MP14-004")
 		self.assertFalse(vcf_test.computeDN(self.vcf_line_with_DN_2), "Compute DN did not recognize that probands mother also has variant")
 
 	def test_compute_DN_true_one_parent(self):
-		vcf_test = vcf(self.June_Cohort["MP14-004"]["index"], self.June_Cohort["MP14-004"]["num_affected"], self.June_Cohort["MP14-004"]["absent"])
-		vcf_test.computeParents()
+		vcf_test = self.person_generator("MP14-004")
 		self.assertTrue(vcf_test.computeDN(self.vcf_line_with_DN_3), "Compute DN did not recognize that probands mother does not have variant")
 
 	#ComputeAD testing
 	def test_compute_AD_false_DN_both_parents(self):
-		vcf_test = vcf(self.June_Cohort["DB14-029"]["index"], self.June_Cohort["DB14-029"]["num_affected"], self.June_Cohort["DB14-029"]["absent"])
-		vcf_test.computeParents()
+		vcf_test = self.person_generator("DB14-029")
 		self.assertFalse(vcf_test.computeAD(self.vcf_line_with_DN_2), "This is actually DN but compute AD came back true")
 
 	def test_compute_AD_true_both_parents(self):
-		vcf_test = vcf(self.June_Cohort["DB14-029"]["index"], self.June_Cohort["DB14-029"]["num_affected"], self.June_Cohort["DB14-029"]["absent"])
-		vcf_test.computeParents()
+		vcf_test = self.person_generator("DB14-029")
 		self.assertTrue(vcf_test.computeAD(self.vcf_line_with_DN_3), "Compute AD did not see variant as AD when it should (one affected, two parents")
 
 	def test_compute_AD_false_multiAffected_both_parents(self):
-		vcf_test = vcf(self.June_Cohort["MP14-001"]["index"], self.June_Cohort["MP14-001"]["num_affected"], self.June_Cohort["MP14-001"]["absent"])
-		vcf_test.computeParents()
+		vcf_test = self.person_generator("MP14-001")
 		self.assertFalse(vcf_test.computeAD(self.vcf_line_with_DN_2), "The variant is in both parents not one the way AD should be")
 		self.assertFalse(vcf_test.computeAD(self.vcf_line_with_DN_4), "The variant is not in the affected sibling")
 
 	def test_compute_AD_true_multiAffected_both_parents(self):
-		vcf_test = vcf(self.June_Cohort["DB14-001"]["index"], self.June_Cohort["DB14-001"]["num_affected"], self.June_Cohort["DB14-001"]["absent"])
-		vcf_test.computeParents()
+		vcf_test = self.person_generator("DB14-001")
 		self.assertTrue(vcf_test.computeAD(self.vcf_line_with_DN_3), "Compute AD did not recognize that both affecteds inherited variant from father")
 
 	def test_compute_AD_false_no_parents(self):
-		vcf_test = vcf(self.June_Cohort["MP14-003"]["index"], self.June_Cohort["MP14-003"]["num_affected"], self.June_Cohort["MP14-003"]["absent"])
-		vcf_test.computeParents()
+		vcf_test = self.person_generator("MP14-003")
 		self.assertFalse(vcf_test.computeAD(self.vcf_line_with_DN), "Compute AD did not recognize that proband has no variant")
 
 	def test_compute_AD_true_no_parents(self):
-		vcf_test = vcf(self.June_Cohort["MP14-003"]["index"], self.June_Cohort["MP14-003"]["num_affected"], self.June_Cohort["MP14-003"]["absent"])
-		vcf_test.computeParents()
+		vcf_test = self.person_generator("MP14-003")
 		self.assertTrue(vcf_test.computeAD(self.vcf_line_with_DN_3), "Compute AD did not recognize that proband has variant without parents")
 
 	def test_compute_AD_false_DN_one_parent(self):
-		vcf_test = vcf(self.June_Cohort["MP14-004"]["index"], self.June_Cohort["MP14-004"]["num_affected"], self.June_Cohort["MP14-004"]["absent"])
-		vcf_test.computeParents()
+		vcf_test = self.person_generator("MP14-004")
 		self.assertFalse(vcf_test.computeAD(self.vcf_line_with_DN_3), "Compute AD thought a DN variant was actually AD")
 
 	def test_compute_AD_true_one_parent(self):
-		vcf_test = vcf(self.June_Cohort["MP14-004"]["index"], self.June_Cohort["MP14-004"]["num_affected"], self.June_Cohort["MP14-004"]["absent"])
-		vcf_test.computeParents()
+		vcf_test = self.person_generator("MP14-004")
 		self.assertTrue(vcf_test.computeAD(self.vcf_line_with_DN_2), "Compute AD did not find variant to be inherited from mother")
 
 	#ComputeXL testing
 	def test_compute_XL_not_X_chromo(self):
-		vcf_test = vcf(self.June_Cohort["DB14-029"]["index"], self.June_Cohort["DB14-029"]["num_affected"], self.June_Cohort["DB14-029"]["absent"])
-		vcf_test.computeParents()
+		vcf_test = self.person_generator("DB14-029")
 		self.assertFalse(vcf_test.computeXL(self.vcf_line_not_X_chromo), "Compute XL thought this was the X chromosome (actually 20)")
 
 	def test_compute_XL_false_both_parents(self):
-		vcf_test = vcf(self.June_Cohort["DB14-029"]["index"], self.June_Cohort["DB14-029"]["num_affected"], self.June_Cohort["DB14-029"]["absent"])
-		vcf_test.computeParents()
+		vcf_test = self.person_generator("DB14-029")
 		self.assertFalse(vcf_test.computeXL(self.vcf_line_with_XL), "Compute XL thought a DN variant was XL")		
 
 	def test_compute_XL_true_both_parents(self):
-		vcf_test = vcf(self.June_Cohort["DB14-029"]["index"], self.June_Cohort["DB14-029"]["num_affected"], self.June_Cohort["DB14-029"]["absent"])
-		vcf_test.computeParents()
+		vcf_test = self.person_generator("DB14-029")
 		self.assertTrue(vcf_test.computeXL(self.vcf_line_with_XL_2), "Compute XL did not recognize an XL variant")
 
 	def test_compute_XL_false_multiAffected_both_parents(self):
-		vcf_test = vcf(self.June_Cohort["DB14-001"]["index"], self.June_Cohort["DB14-001"]["num_affected"], self.June_Cohort["DB14-001"]["absent"])
-		vcf_test.computeParents()
+		vcf_test = self.person_generator("DB14-001")
 		self.assertFalse(vcf_test.computeXL(self.vcf_line_with_XL), "Compute XL did not realize sibling is missing variant")
 
 	def test_compute_XL_false_multiAffected_inherited_from_dad(self):
-		vcf_test = vcf(self.June_Cohort["MP14-001"]["index"], self.June_Cohort["MP14-001"]["num_affected"], self.June_Cohort["MP14-001"]["absent"])
-		vcf_test.computeParents()
+		vcf_test = self.person_generator("MP14-001")
 		self.assertFalse(vcf_test.computeXL(self.vcf_line_with_XL_2), "Compute XL did not realize inheritance was from father")
 
 	def test_compute_XL_true_multiAffected_both_parents(self):
-		vcf_test = vcf(self.June_Cohort["MP14-001"]["index"], self.June_Cohort["MP14-001"]["num_affected"], self.June_Cohort["MP14-001"]["absent"])
-		vcf_test.computeParents()
+		vcf_test = self.person_generator("MP14-001")
 		self.assertTrue(vcf_test.computeXL(self.vcf_line_with_XL), "Compute XL did not work for two sibilings")
 
 	def test_compute_XL_false_no_parents(self):
-		vcf_test = vcf(self.June_Cohort["MP14-003"]["index"], self.June_Cohort["MP14-003"]["num_affected"], self.June_Cohort["MP14-003"]["absent"])
-		vcf_test.computeParents()
+		vcf_test = self.person_generator("MP14-003")
 		self.assertFalse(vcf_test.computeXL(self.vcf_line_with_XL), "Compute XL did not recognize that proband has no variant")
 
 	def test_compute_XL_true_no_parents(self):
-		vcf_test = vcf(self.June_Cohort["MP14-003"]["index"], self.June_Cohort["MP14-003"]["num_affected"], self.June_Cohort["MP14-003"]["absent"])
-		vcf_test.computeParents()
+		vcf_test = self.person_generator("MP14-003")
 		self.assertTrue(vcf_test.computeXL(self.vcf_line_with_XL_2), "Compute XL did not recognize that proband has variant")
 
 	def test_compute_XL_false_one_parent(self):
-		vcf_test = vcf(self.June_Cohort["MP14-004"]["index"], self.June_Cohort["MP14-004"]["num_affected"], self.June_Cohort["MP14-004"]["absent"])
-		vcf_test.computeParents()
+		vcf_test = self.person_generator("MP14-004")
 		self.assertFalse(vcf_test.computeXL(self.vcf_line_with_XL), "Compute XL did not recognize that probands mom has variant variant only")
 
 	def test_compute_XL_true_one_parent(self):
-		vcf_test = vcf(self.June_Cohort["MP14-004"]["index"], self.June_Cohort["MP14-004"]["num_affected"], self.June_Cohort["MP14-004"]["absent"])
-		vcf_test.computeParents()
+		vcf_test = self.person_generator("MP14-004")
 		self.assertTrue(vcf_test.computeXL(self.vcf_line_with_XL_2), "Compute XL did not recognize that proband has variant from mother")
 
 	def test_compute_XL_false_one_parent_inherited_from_dad(self):
@@ -310,46 +282,37 @@ class Vcf_Filter_Test(unittest.TestCase):
 
 	# ComputeAR testing, homozygous cases...
 	def test_compute_AR_HM_false_both_parents(self):
-		vcf_test = vcf(self.June_Cohort["DB14-029"]["index"], self.June_Cohort["DB14-029"]["num_affected"], self.June_Cohort["DB14-029"]["absent"])
-		vcf_test.computeParents()
+		vcf_test = self.person_generator("DB14-029")
 		self.assertFalse(vcf_test.computeAR(self.vcf_line_with_AR_HM_2), "This found a 0/1 variant to be HM...")
 
 	def test_compute_AR_HM_true_both_parents(self):
-		vcf_test = vcf(self.June_Cohort["DB14-029"]["index"], self.June_Cohort["DB14-029"]["num_affected"], self.June_Cohort["DB14-029"]["absent"])
-		vcf_test.computeParents()
+		vcf_test = self.person_generator("DB14-029")
 		self.assertTrue(vcf_test.computeAR(self.vcf_line_with_AR_HM), "This did not find a single affected child to be AR-HM")
 
 	def test_compute_AR_HM_false_multiAffected_both_parents(self):
-		vcf_test = vcf(self.June_Cohort["DB14-001"]["index"], self.June_Cohort["DB14-001"]["num_affected"], self.June_Cohort["DB14-001"]["absent"])
-		vcf_test_2 = vcf(self.June_Cohort["MP14-001"]["index"], self.June_Cohort["MP14-001"]["num_affected"], self.June_Cohort["MP14-001"]["absent"])
-		vcf_test.computeParents()
-		vcf_test_2.computeParents()
+		vcf_test = self.person_generator("DB14-001")
+		vcf_test_2 = self.person_generator("MP14-001")
 		self.assertFalse(vcf_test.computeAR(self.vcf_line_with_AR_HM), "Did not realize parents are both 1/1 as well")
 		self.assertFalse(vcf_test_2.computeAR(self.vcf_line_with_AR_HM), "Did not realize that sibling does not possess 1/1 as well")
 
 	def test_compute_AR_HM_true_multiAffected_both_parents(self):
-		vcf_test = vcf(self.June_Cohort["DB14-001"]["index"], self.June_Cohort["DB14-001"]["num_affected"], self.June_Cohort["DB14-001"]["absent"])
-		vcf_test.computeParents()
+		vcf_test = self.person_generator("DB14-001")
 		self.assertTrue(vcf_test.computeAR(self.vcf_line_with_AR_HM_2), "Did not find both sibling to have 1/1 inherited from parents")
 
 	def test_compute_AR_HM_false_no_parents(self):
-		vcf_test = vcf(self.June_Cohort["MP14-003"]["index"], self.June_Cohort["MP14-003"]["num_affected"], self.June_Cohort["MP14-003"]["absent"])
-		vcf_test.computeParents()
+		vcf_test = self.person_generator("MP14-003")
 		self.assertFalse(vcf_test.computeAR(self.vcf_line_with_AR_HM_2), "Did not realize proband is only heterozygous")
 
 	def test_compute_AR_HM_true_no_parents(self):
-		vcf_test = vcf(self.June_Cohort["MP14-003"]["index"], self.June_Cohort["MP14-003"]["num_affected"], self.June_Cohort["MP14-003"]["absent"])
-		vcf_test.computeParents()
+		vcf_test = self.person_generator("MP14-003")
 		self.assertTrue(vcf_test.computeAR(self.vcf_line_with_AR_HM), "Did not find proband to be 1/1 without any parents")
 
 	def test_compute_AR_HM_false_DN_one_parent(self):
-		vcf_test = vcf(self.June_Cohort["MP14-004"]["index"], self.June_Cohort["MP14-004"]["num_affected"], self.June_Cohort["MP14-004"]["absent"])
-		vcf_test.computeParents()
+		vcf_test = self.person_generator("MP14-004")
 		self.assertFalse(vcf_test.computeAR(self.vcf_line_with_AR_HM), "Probands sinlge parent is also 1/1")
 
 	def test_compute_AR_HM_true_one_parent(self):
-		vcf_test = vcf(self.June_Cohort["MP14-004"]["index"], self.June_Cohort["MP14-004"]["num_affected"], self.June_Cohort["MP14-004"]["absent"])
-		vcf_test.computeParents()
+		vcf_test = self.person_generator("MP14-004")
 		self.assertTrue(vcf_test.computeAR(self.vcf_line_with_AR_HM_2), "Proband and single parent fit for HM")
 
 if __name__ == '__main__':
