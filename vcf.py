@@ -88,11 +88,11 @@ class vcf:
 	#returns an array of [True, False, False, True, etc]
 	#could be used to hard filter out exonic vs non-
 	def mapSearch(self,searchStr,arr):
-		print('mapSearch(searchStr, arr):')
+		#print('mapSearch(searchStr, arr):')
 		#print('\tsearchStr: ' + searchStr + ' arr: ' + arr)
 		v = map(lambda x: re.search(searchStr, x) != None, arr)       
 		#v = map(lambda x: re.search(searchStr, x) != None, line.split('\t')[self.proband:])       
-		print('v: ' + str(v))                                                  
+		#print('v: ' + str(v))                                                  
 		return v                                                               
 	
 	#detects the proband offset for the current line.
@@ -280,9 +280,21 @@ class vcf:
 
 		if (len(compHet['father']) > 0 and len(compHet['mother']) > 0):
 			return (True, compHet['father'], compHet['mother'])
-
-	def filter(self, freq, file=None):
-		pass
+	
+	def computeAlleleFreq(self, line):
+		print("in computeallelefreq: " + line)	
+		line = line.split('\t')
+		x = self.mapSearch('GT:AD:DP:GQ:PL', line)  #x marks the spot 
+		arrIndex = 0
+		if x.count(True) > 0:
+			arrIndex = [idx for idx in range(len(x)) if x[idx] == True][0] + 1
+		#other info starts at line[arrIndex]
+		print('arrIndex: ' + str(arrIndex))
+		zero_one_count = self.mapSearch('0/1', line[arrIndex:]).count(True)
+		one_one_count = self.mapSearch('1/1', line[arrIndex:]).count(True)
+		
+		numSamples = len(line[arrIndex:])
+		return (float(zero_one_count) + 2.0 * float(one_one_count)) / float(2*numSamples)
 
 def main(argv):
 	pedigree = '' 
