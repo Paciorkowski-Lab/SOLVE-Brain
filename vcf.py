@@ -238,7 +238,7 @@ class vcf:
 		#outfile = open('CH_out_1-1_strict_attempt2.txt', 'w')
 		geneHash = self.buildGeneHash(filein)
 		for gene in geneHash: #iterates over keys
-			if isGeneCH(geneHash[gene])
+			if isGeneCH(geneHash[gene]):
 				#some way to out to file. i know. use a method that doesnt exist yet
 				writeHash(fileout, geneHash[gene])
 	#in this method, we are looking at variants of this particular gene
