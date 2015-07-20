@@ -212,7 +212,7 @@ class vcf:
 			self.filein = open(filein, 'r')
 
 		for line in self.filein:
-			l = line.split();
+			l = line.split("\t");
 			geneName = l[6]
 			key = ''.join(l[1:5])
 			if geneName in self.geneHash:
@@ -276,10 +276,10 @@ class vcf:
 							compHet['mother'] = motherVariants
 		else: #this variantHash contained fewer than 2 variants (one variant) 
 			#with the exception that we want definitive proof both parents are present
-			return self.computeAR(variantHash[variantHash.keys()[0]]) 
+			return False 
 
-		return len(compHet['father']) > 0 and len(compHet['mother']) > 0
-					#outfile.write(compHet[gene][var])
+		if (len(compHet['father']) > 0 and len(compHet['mother']) > 0):
+			return (True, compHet['father'], compHet['mother'])
 
 	def filter(self, freq, file=None):
 		pass
