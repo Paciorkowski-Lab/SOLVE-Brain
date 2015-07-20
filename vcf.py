@@ -255,7 +255,7 @@ class vcf:
 
 				fromFather = self.isFather(inherited) and not self.absentFather
 				fromMother = self.isMother(inherited) and not self.absentMother
-				if (self.isProbands(hetero) and (fromFather != fromMother):
+				if (self.isProbands(hetero) and (fromFather != fromMother)):
 					#the proband has this (how to deal w parents) dd to compHet
 					if fromFather and not fromMother:
 						if 'father' in compHet and compHet['father'] is not None:
@@ -268,6 +268,7 @@ class vcf:
 							compHet['father'] = fatherVariants
 					elif fromMother and not fromFather:
 						if 'mother' in compHet and compHet['mother'] is not None:
+							pass
 							#dont do nothin
 						else:
 							motherVariants = {}
