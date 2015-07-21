@@ -115,31 +115,24 @@ class vcf:
 		return (not self.absentMother and the_array[self.mother]) or self.absentMother
 
 	#you can pass in a built in flag if you want
+	# Now only computes two of three when homo is not needed
 	def computeVCFLine(self, line): #filein = None, fileout = None
-		homo = self.computeFam('1/1', line)
+		if self.pedigree == "AR" or self.pedigree is None:
+			homo = self.computeFam('1/1', line)
 		hetero = self.computeFam('0/1', line)
 		absent = self.computeFam('0/0', line)
 		return {"homo": homo, "hetero": hetero, "absent": absent}          
-		#return (homo, hetero, absent)
 	
 	def computeAR(self, line):
-		triplet = self.computeVCFLine(line)
-		#variant, inherited = triplet["homozygous"], triplet["heterozygous"]            
+		triplet = self.computeVCFLine(line)           
 		variant, inherited = triplet['homo'], triplet['hetero']
-
-		#call perl for CH aspect...
 		
 		return self.isProbands(variant) and (self.isFather(inherited)  and self.isMother(inherited))
-
-		# return (variant[self.proband] and\
-		# (not self.absentMother and inherited[self.mother]) and\
-		# (not self.absentFather and inherited[self.father])) #definition of homozygous recessive
 
 	def computeAD(self, line):
 		triplet = self.computeVCFLine(line)
 		variant, inherited, notPresent = triplet['hetero'], triplet['hetero'], triplet['absent']
 
-		#return self.isProbands(variant) and (self.isFather(inherited) != self.isMother(inherited))
 		if self.absentFather and self.absentMother:
 			return self.isProbands(variant)
 		else:
@@ -151,9 +144,7 @@ class vcf:
 		
 		return self.isProbands(variant) and (self.isFather(notPresent) and self.isMother(notPresent))
 
-	def computeXL(self, line):
-		#xChrom = self.mapSearch('X', line)             
-		#if xChrom[0]: #X chromosome                    
+	def computeXL(self, line):                  
 		if re.search("X", line[:1]) != None:            
 			triplet = self.computeVCFLine(line)
 			variant, inherited , notPresent = triplet['hetero'], triplet['hetero'], triplet['absent']
@@ -203,7 +194,7 @@ class vcf:
 			l = line.split("\t");
 			geneName = l[6]
 			key = ''.join(l[1:5])
-			if geneName in self.geneHash:
+			if geneName in geneHash:
 				geneHash[geneName][key] = line
 			else:
 				variant = {}
@@ -221,53 +212,84 @@ class vcf:
 					print self.geneHash[gene][var]
 
 	#still in progress
-#should return true, fase..?
+
+	#writes the variant line, in order of the position (same as before)
+	#will probably change a bit when passing self.fileout (may already be open) and will not need to be closed.
+	def writeHash(self, variantHash, fileout=None):
+		if fileout is not None:
+			output_file = open(fileout, "w")
+			for variant in sorted(variantHash):
+				output_file.write(variantHash[variant])
+		output_file.close()
+
+	#should return true, fase..?
 	def computeCompoundHet(self, filein=None, fileout=None):
 		#outfile = open('CH_out_1-1_strict_attempt2.txt', 'w')
+
+		#using to test
+		#output_file = open(fileout, "w")
 		geneHash = self.buildGeneHash(filein)
 		for gene in geneHash: #iterates over keys
-			if isGeneCH(geneHash[gene]):
+			gene_status = self.isGeneCH(geneHash[gene])
+			if gene_status[0]:
 				#some way to out to file. i know. use a method that doesnt exist yet
-				writeHash(fileout, geneHash[gene])
+				gene_dict = dict(gene_status[1], **gene_status[2])
+				self.writeHash(gene_dict, fileout)
+
+		#put here for testing, close() would normally be called in main...
+		self.filein.close()
+
 	#in this method, we are looking at variants of this particular gene
 	def isGeneCH(self, variantHash): #geneHash[gene] returns a hash of variants for that gene. I know.
 		compHet = {}
 		
 		if len(variantHash) >= 2:
 			for variantKey in variantHash:
+
+			# was sorting for test purposes, may not need to be...
+			# for variantKey in sorted(variantHash):
 				variantLine = variantHash[variantKey]
 					#proband = self.probandOffset(variantLine, 11) #super hard-coded for now
 					
 				triplet = self.computeVCFLine(variantLine)
-				hetero, inherited = triplet['hetero'], triplet['hetero']
+				hetero, inherited, notPresent = triplet['hetero'], triplet['hetero'], triplet['absent']
 
 				fromFather = self.isFather(inherited) and not self.absentFather
 				fromMother = self.isMother(inherited) and not self.absentMother
+				# using for testing purposes...
+				# print(variantKey, fromFather, fromMother)
 				if (self.isProbands(hetero) and (fromFather != fromMother)):
 					#the proband has this (how to deal w parents) dd to compHet
 					if fromFather and not fromMother:
-						if 'father' in compHet and compHet['father'] is not None:
-							#found another match for father--dont do nothin
-							#or add to an existing hash that keeps track of father-inherited variants
-							compHet['father'][variantKey] = variantLine
-						else:
-							fatherVariants = {}
-							fatherVariants[variantKey] = variantLine
-							compHet['father'] = fatherVariants
+						if self.isMother(notPresent) and not self.absentMother:
+							if 'father' in compHet and compHet['father'] is not None:
+								#found another match for father--dont do nothin
+								#or add to an existing hash that keeps track of father-inherited variants
+								compHet['father'][variantKey] = variantLine
+							else:
+								fatherVariants = {}
+								fatherVariants[variantKey] = variantLine
+								compHet['father'] = fatherVariants
 					elif fromMother and not fromFather:
-						if 'mother' in compHet and compHet['mother'] is not None:
-							pass
-							#dont do nothin
-						else:
-							motherVariants = {}
-							motherVariants[variantKey] = variantLine
-							compHet['mother'] = motherVariants
+						if self.isFather(notPresent) and not self.absentFather:
+							if 'mother' in compHet and compHet['mother'] is not None:
+								compHet['mother'][variantKey] = variantLine
+							else:
+								motherVariants = {}
+								motherVariants[variantKey] = variantLine
+								compHet['mother'] = motherVariants
+
+
 		else: #this variantHash contained fewer than 2 variants (one variant) 
 			#with the exception that we want definitive proof both parents are present
-			return False 
+			return [False] 
 
-		if (len(compHet['father']) > 0 and len(compHet['mother']) > 0):
+		if (('father' in compHet and 'mother' in compHet) and len(compHet['father']) > 0 and len(compHet['mother']) > 0):
 			return (True, compHet['father'], compHet['mother'])
+		else:
+			return [False]
+
+
 	
 	def computeAlleleFreq(self, line):
 		print("in computeallelefreq: " + line)	
