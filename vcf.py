@@ -252,7 +252,10 @@ class vcf:
 	#in this method, we are looking at variants of this particular gene
 	def isGeneCH(self, variantHash): #geneHash[gene] returns a hash of variants for that gene. I know.
 		compHet = {}
-		
+		#hows this workaround:
+		compHet['father'] = {}
+		compHet['mother'] = {}
+			
 		if len(variantHash) >= 2:
 			for variantKey in variantHash:
 
@@ -294,10 +297,10 @@ class vcf:
 			#with the exception that we want definitive proof both parents are present
 			return [False] 
 
-		if (('father' in compHet and 'mother' in compHet) and len(compHet['father']) > 0 and len(compHet['mother']) > 0):
-			return (True, compHet['father'], compHet['mother'])
-		else:
-			return [False]
+#		if (('father' in compHet and 'mother' in compHet) and len(compHet['father']) > 0 and len(compHet['mother']) > 0):
+		return (compHet['father'], compHet['mother'])
+		#else:
+		#	return [False]
 
 	def computeAlleleFreq(self, line):
 		print("in computeallelefreq: " + line)	
