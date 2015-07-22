@@ -203,6 +203,8 @@ class vcf:
 		#not esoteric debate: the pros and cons of self.geneHash vs returning a geneHash
 		return geneHash
 
+	#def addGeneHash():
+		
 	#whether self.geneHash is a thing or not will greatly affect this.
 	def printGeneHash(self):
 		for gene in self.geneHash:
@@ -221,7 +223,15 @@ class vcf:
 			for variant in sorted(variantHash):
 				output_file.write(variantHash[variant])
 		output_file.close()
-
+	
+	#verify this later
+	def intersectGeneHash(self, gH1, gH2):
+		for gene in gH2:
+			if gene in gH1:
+				for variant in gH2[gene]:
+					gH1[gene][variant] = gH2[gene][variant]
+		return gH1
+	
 	#should return true, fase..?
 	def computeCompoundHet(self, filein=None, fileout=None):
 		#outfile = open('CH_out_1-1_strict_attempt2.txt', 'w')
@@ -289,8 +299,6 @@ class vcf:
 		else:
 			return [False]
 
-
-	
 	def computeAlleleFreq(self, line):
 		print("in computeallelefreq: " + line)	
 		line = line.split('\t')
@@ -303,7 +311,11 @@ class vcf:
 		zero_one_count = self.mapSearch('0/1', line[arrIndex:]).count(True)
 		one_one_count = self.mapSearch('1/1', line[arrIndex:]).count(True)
 		
-		numSamples = len(line[arrIndex:])
+		numSamples = len(line[arrIndex:]) 
+		#- self.mapSearch('./.', line[arrIndex:]).count(True)
+		print {numSamples: numSamples}
+		numBlank = self.mapSearch('./.', line[arrIndex:]).count(True)
+		print {numBlank: numBlank}
 		return (float(zero_one_count) + 2.0 * float(one_one_count)) / float(2*numSamples)
 
 def main(argv):
