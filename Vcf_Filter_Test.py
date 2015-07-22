@@ -75,7 +75,7 @@ class Vcf_Filter_Test(unittest.TestCase):
 	entire_cohort = 12
 
 	def person_generator(self, person):
-		new_person = vcf(self.June_Cohort[person]["index"], self.June_Cohort[person]["num_affected"], self.June_Cohort[person]["absent"])
+		new_person = vcf(self.June_Cohort[person]["index"], self.June_Cohort[person]["num_affected"], self.June_Cohort[person]["absent"], self.snv_file_June, self.indel_file_June, self.pedigree[0], "/home/alex/Documents/Frankie_Analysis/SOLVE_BRAIN_TEST/")
 		new_person.computeParents()
 		return new_person
 
@@ -339,21 +339,21 @@ class Vcf_Filter_Test(unittest.TestCase):
 	def test_manual_compound_het_test_db14_001(self):
 		# print("\nDB14-001")
 		vcf_test = self.person_generator("DB14-001")
-		vcf_test.computeCompoundHet(self.ch_lines_to_test, "/home/alex/Documents/Frankie_Analysis/SOLVE_BRAIN_TEST/solve-brain-jf-master/DB14-001_CH_test.txt")
+		vcf_test.computeCompoundHet(self.ch_lines_to_test, "/home/alex/Documents/Frankie_Analysis/SOLVE_BRAIN_TEST/solve-brain-jf-master/DB14-001_CH_test")
 		file_length = self.file_len("/home/alex/Documents/Frankie_Analysis/SOLVE_BRAIN_TEST/solve-brain-jf-master/DB14-001_CH_test.txt")
 		self.assertEqual(file_length, 0, "DB14-001 was found to have compound het variants and should not have")
 
 	def test_manual_compound_het_test_mp14_001(self):
 		# print("\nMP14-001")
 		vcf_test = self.person_generator("MP14-001")
-		vcf_test.computeCompoundHet(self.ch_lines_to_test, "/home/alex/Documents/Frankie_Analysis/SOLVE_BRAIN_TEST/solve-brain-jf-master/MP14-001_CH_test.txt")
+		vcf_test.computeCompoundHet(self.ch_lines_to_test, "/home/alex/Documents/Frankie_Analysis/SOLVE_BRAIN_TEST/solve-brain-jf-master/MP14-001_CH_test")
 		file_length = self.file_len("/home/alex/Documents/Frankie_Analysis/SOLVE_BRAIN_TEST/solve-brain-jf-master/MP14-001_CH_test.txt")
 		self.assertEqual(file_length, 2, "MP14-001 was found to have more/less than 2 compound het variants and should not have")
 
 	def test_manual_compound_het_test_db14_029(self):
 		# print("\nDB14-029")
 		vcf_test = self.person_generator("DB14-029")
-		vcf_test.computeCompoundHet(self.ch_lines_to_test, "/home/alex/Documents/Frankie_Analysis/SOLVE_BRAIN_TEST/solve-brain-jf-master/DB14-029_CH_test.txt")
+		vcf_test.computeCompoundHet(self.ch_lines_to_test, "/home/alex/Documents/Frankie_Analysis/SOLVE_BRAIN_TEST/solve-brain-jf-master/DB14-029_CH_test")
 		file_length = self.file_len("/home/alex/Documents/Frankie_Analysis/SOLVE_BRAIN_TEST/solve-brain-jf-master/DB14-029_CH_test.txt")
 		self.assertEqual(file_length, 3, "MDB14-029 was found to have more/less than 3 compound het variants and should not have")
 

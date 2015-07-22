@@ -4,13 +4,13 @@ import logging, sys, getopt, re
 class vcf: 
 	
 	def __init__(self, proband_index = None, num_affected = None, absent = None, snv = None, indel = None, pedigree = None, output = None):
-		self.proband = proband_index
-		self.num_affected = num_affected
+		self.proband = int(proband_index)
+		self.num_affected = int(num_affected)
 		self.absent = absent
 		self.snvFile = snv
 		self.indelFile = indel
 		self.pedigree = pedigree
-		self.output = output
+		self.output = None
 		self.mother = 0
 		self.father = 0
 		self.parent_num = 0                                                       
@@ -25,6 +25,13 @@ class vcf:
 		self.geneHash = {}
 		self.snvHash = {"father": {}, "mother": {}}
 		self.indelHash = {"father": {}, "mother": {}}
+
+		if output != None and pedigree != None:
+			self.output = output + "_" + pedigree + ".vcf"
+			print "here DN is pedigree" + self.output
+		else:
+			self.output = output + ".vcf"
+			print "what the fuck main"
 
 			
 		#could be better.generalize to input file. outputfile has name snv or indel.
@@ -43,10 +50,10 @@ class vcf:
 		#hard-coded for now. we can determine proband offset based on this. should be a param
 		#indexin = open('June_2015.list', 'rb')
  
-		if self.fileout != None:
-			self.fileout = open(output, 'w')
-			logging.info('computePedigree(filein, fileout): ' + str(self.filein) + ' , ' + str(self.fileout))
-			print('computePedigree(filein, fileout): ' + str(self.filein) + ' , ' + str(self.fileout))
+		# if self.fileout == None:
+		# 	self.fileout = open(self.output, 'w')
+		# 	logging.info('computePedigree(filein, fileout): ' + str(self.filein) + ' , ' + str(self.fileout))
+		# 	print('computePedigree(filein, fileout): ' + str(self.filein) + ' , ' + str(self.fileout))
 	
 	def close(self):	
 		self.filein.close()
@@ -78,7 +85,10 @@ class vcf:
 		return [self.absentFather, self.absentMother]
 
 	def computeFam(self, searchStr, line):
+		# print(line)
+		# print(str(self.proband) + ":" + str((self.proband + self.num_affected + self.parent_num)))
 		family = self.mapSearch(searchStr, line.split('\t')[self.proband:(self.proband + self.num_affected + self.parent_num)])
+		# print (self.false_array + family)
 		return self.false_array + family
 
 	#returns an array of [True, False, False, True, etc]
@@ -120,8 +130,8 @@ class vcf:
 	#you can pass in a built in flag if you want
 	# Now only computes two of three when homo is not needed
 	def computeVCFLine(self, line): #filein = None, fileout = None
-		if self.pedigree == "AR" or self.pedigree is None:
-			homo = self.computeFam('1/1', line)
+		
+		homo = self.computeFam('1/1', line)
 		hetero = self.computeFam('0/1', line)
 		absent = self.computeFam('0/0', line)
 		return {"homo": homo, "hetero": hetero, "absent": absent}          
@@ -159,10 +169,14 @@ class vcf:
 	#in that case probandOffset, offsets are needed
 	def computePedigree(self, filein=None, fileout=None):
 #		self.__computePedigree(self.filein, self.fileout)
+		if self.snvFile is filein:
+			base = "_" + self.pedigree + "_snv.vcf"
+		else:
+			base = "_" + self.pedigree + "_indel.vcf"
 		if filein != None:
-			self.filein = filein
+			self.filein = open(filein, "r")
 		if fileout != None:
-			self.fileout = fileout	
+			self.fileout = open(fileout + base, "w")	
 		
 		print('computePedigree(filein, fileout)')
 		print('\tpedigree: ' + self.pedigree)
@@ -174,8 +188,10 @@ class vcf:
 
 			#slightly diff scenario for CH due to comparisons on a gene to gene basis
 			#rather than a line basis
-			snvHash = self.computeCompoundHet(self.snvFile, self.fileout)
-			indelHash = self.computeCompoundHet(self.indelFile, self.fileout)
+			if self.snvFile is filein:
+				self.computeCompoundHet(self.snvFile, fileout)
+			else:
+				self.computeCompoundHet(self.indelFile, fileout)
 		elif self.pedigree == 'AD':
 			for line in self.filein:
 				if self.computeAD(line):
@@ -235,36 +251,59 @@ class vcf:
 				for variant in gH2[gene]:
 					gH1[gene][variant] = gH2[gene][variant]
 		return gH1
+
+	def addGeneHash(self, gH1, gH2):
+		for gene in gH2:
+			if gene in gH1:
+				for variant in gH2[gene]:
+					if variant in gH1[gene]:
+						gH1[gene][variant] = gH2[gene][variant]
+
+		return gH1
 	
 	#should return true, fase..?
 	def computeCompoundHet(self, filein=None, fileout=None):
 		#outfile = open('CH_out_1-1_strict_attempt2.txt', 'w')
-		if self.snvFile is filein:
-			isSNV = True
+		gene_dict = {}
 		#using to test
 		#output_file = open(fileout, "w")
 		geneHash = self.buildGeneHash(filein)
 		for gene in geneHash: #iterates over keys
-			gene_status = self.compileParentHash(geneHash[gene])
-			if self.snvFile is filein:
-				self.snvHash['father'][gene] = gene_status[0]
-				self.snvHash['mother'][gene] = gene_status[1]
-			else:
-				self.indelHash['father'][gene] = gene_status[0]
-				self.indelHash['mother'][gene] = gene_status[1]
-			if len(gene_status[0]) > 0 and len(gene_status[1] > 0) :
+			parentsCH = self.compileParentHash(geneHash[gene])
+			
+			if (len(parentsCH[0]) > 0 and len(parentsCH[1]) > 0) :
 				#some way to out to file. i know. use a method that doesnt exist yet
-				gene_dict = dict(gene_status[1], **gene_status[2])
-		self.writeHash(gene_dict, fileout)
-		if self.snvHash['father'] > 0 and self.indelHash['father'] > 0:
+				gene_dict = dict(parentsCH[0], **parentsCH[1])
+
+			if self.snvFile is filein:
+				if len(parentsCH[0]) > 0:
+					self.snvHash['father'][gene] = parentsCH[0]
+				if len(parentsCH[1]) > 0:
+					self.snvHash['mother'][gene] = parentsCH[1]
+				self.writeHash(gene_dict, fileout + "_snv_CH.vcf")
+			else:
+				if len(parentsCH[0]) > 0:
+					self.indelHash['father'][gene] = parentsCH[0]
+				if len(parentsCH[1]) > 0:
+					self.indelHash['mother'][gene] = parentsCH[1]
+				self.writeHash(gene_dict, fileout + "_indel_CH.vcf")
+		
+		#there could be no snv_indel compHet and therfore should be checked...
+		if (len(self.snvHash['father']) > 0 and len(self.indelHash['mother']) > 0) or (len(self.snvHash['mother']) > 0 and len(self.indelHash['father']) > 0):
 			#compile both subsets of father and mother hashes
-			#run compile parentHash on bioth individually
+			snvFather_indelMother = self.intersectGeneHash(self.indelHash['mother'], self.snvHash['father'])
+			snvMother_indelFather = self.intersectGeneHash(self.indelHash['father'], self.snvHash['mother'])
+			#run compile parentHash on both individually
+			print(snvFather_indelMother)
+			first_half_compiled = self.compileParentHash(snvFather_indelMother)
+			second_half_compiled = self.compileParentHash(snvMother_indelFather)
 			#take the returned data and put into snv_indel_hash
+			#need to conceptually think about whether duplicate keys could exist and adding compromised...
+			snv_indel_father = dict(first_half_compiled[0], **second_half_compiled[0])
+			snv_indel_mother = dict(first_half_compiled[1], **second_half_compiled[1])
+			snv_indel_compiled = dict(snv_indel_father, **snv_indel_mother)
 			#write snv_indel_hash
-
-
-		#put here for testing, close() would normally be called in main...
-		self.filein.close()
+			self.writeHash(snv_indel_compiled, fileout + "snv_indel_CH.vcf")
 
 	#in this method, we are looking at variants of this particular gene
 	def compileParentHash(self, variantHash): #geneHash[gene] returns a hash of variants for that gene. I know.
@@ -380,11 +419,9 @@ def main(argv):
 	x = vcf(proband, num_affected, absent, snv, indel, pedigree, output)
 	#x.buildGeneHash()
 	
-	x.computePedigree(self.snvFile, out)
-	x.computePedigree(self.indelFile, out)
-	if self.pedigree == 'AR':
-		self.combineHash()
-		self.snv_indel_CH()
+	x.computePedigree(snv, output)
+	x.computePedigree(indel, output)
+
 
 	x.close()
  

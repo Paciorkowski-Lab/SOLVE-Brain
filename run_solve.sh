@@ -342,8 +342,8 @@ intermed_combined_files=$combined_basename
 
 #DO NOT NEED
 #REPLACE IMMEDIATELY
-	python vcf.py --NUM_AFFECTED=$num_affected --PROBAND=$proband_index --SNV=$active_snv_vcf --PEDIGREE=$pedigree --OUTPUT=$output_base --ABSENT=$absent
-        python vcf.py --NUM_AFFECTED=$num_affected --PROBAND=$proband_index --INDEL=$active_indel_vcf --PEDIGREE=$pedigree --OUTPUT=$output_base --ABSENT=$absent
+	python vcf.py --NUM_AFFECTED=$num_affected --PROBAND=$proband_index --SNV=$active_snv_vcf --INDEL=$active_indel_vcf --PEDIGREE=$pedigree --OUTPUT=$output_base --ABSENT=$absent
+       
 
 
 #filter by pedigree
