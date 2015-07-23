@@ -239,7 +239,7 @@ class vcf:
 	#will probably change a bit when passing self.fileout (may already be open) and will not need to be closed.
 	def writeHash(self, variantHash, fileout=None):
 		if fileout is not None:
-			output_file = open(fileout, "w")
+			output_file = open(fileout, "a")
 			for variant in sorted(variantHash):
 				output_file.write(variantHash[variant])
 		output_file.close()
@@ -276,13 +276,12 @@ class vcf:
 	#should return true, fase..?
 	def computeCompoundHet(self, filein=None, fileout=None):
 		#outfile = open('CH_out_1-1_strict_attempt2.txt', 'w')
-		gene_dict = {}
 		#using to test
 		#output_file = open(fileout, "w")
 		geneHash = self.buildGeneHash(filein)
 		for gene in geneHash: #iterates over keys
+			gene_dict = {}
 			parentsCH = self.compileParentHash(geneHash[gene])
-			
 			if (len(parentsCH[0]) > 0 and len(parentsCH[1]) > 0) :
 				#some way to out to file. i know. use a method that doesnt exist yet
 				gene_dict = dict(parentsCH[0], **parentsCH[1])
@@ -300,10 +299,10 @@ class vcf:
 					self.indelHash['mother'][gene] = parentsCH[1]
 				self.writeHash(gene_dict, fileout + "_indel_CH.vcf")
 	
-		for key in set:
-			variants = father[key]
-			for v in variants:
-				#write	
+		# for key in set:
+		# 	variants = father[key]
+		# 	for v in variants:
+		# 		#write	
 		#there could be no snv_indel compHet and therfore should be checked...
 		if (len(self.snvHash['father']) > 0 and len(self.indelHash['mother']) > 0) or (len(self.snvHash['mother']) > 0 and len(self.indelHash['father']) > 0):
 			keySets = self.computeCHetHelper(self.snvHash['father'], self.snvHash['mother'], self.indelHash['father'], self.indelHash['mother'])
@@ -314,11 +313,12 @@ class vcf:
 			for key in keySets[0]:
 			#	self.writeHash(self.snvFather[keySets[0][key]], fileout + 'snv_indel_CH.vcf')
 			#	self.writeHash(self.indelMother[keySets[0][key]], fileout + 'snv_indel_CH.vcf')
-				self.writeHash(self.snvFather[key])
-				self.writeHash(self.indelMother[key])
+				self.writeHash(self.snvHash['father'][key], fileout + '_snv_indel_CH.vcf')
+				self.writeHash(self.indelHash['mother'][key], fileout + '_snv_indel_CH.vcf')
 			for key in keySets[1]:
-				self.writeHash(self.indelFather[key])
-				self.writeHash(self.snvMother[key])
+				print(key)
+				self.writeHash(self.indelHash['father'][key], fileout + '_snv_indel_CH.vcf')
+				self.writeHash(self.snvHash['mother'][key], fileout + '_snv_indel_CH.vcf')
 	#print(snvFather_indelMother)
 		#	first_half_compiled = self.compileParentHash(snvFather_indelMother)
 			#second_half_compiled = self.compileParentHash(snvMother_indelFather)
@@ -326,10 +326,10 @@ class vcf:
 			#need to conceptually think about whether duplicate keys could exist and adding compromised...
 			#snv_indel_father = dict(first_half_compiled[0], **second_half_compiled[0])
 			#snv_indel_mother = dict(first_half_compiled[1], **second_half_compiled[1])
-			snv_indel_compiled = dict(snv_indel_father, **snv_indel_mother)
+			#snv_indel_compiled = dict(snv_indel_father, **snv_indel_mother)
 			#write snv_indel_hash
 			
-			self.writeHash(snv_indel_compiled, fileout + "snv_indel_CH.vcf")
+			#self.writeHash(snv_indel_compiled, fileout + "snv_indel_CH.vcf")
 
 	#in this method, we are looking at variants of this particular gene
 	def compileParentHash(self, variantHash): #geneHash[gene] returns a hash of variants for that gene. I know.
