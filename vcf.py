@@ -260,7 +260,29 @@ class vcf:
 						gH1[gene][variant] = gH2[gene][variant]
 
 		return gH1
+	##look at all these ops on geneHashes. Its like we're extending dict but dont have the balls to write a geneHash class.
 	
+	#python has sets! omg
+	def computeCH(snvFather, snvMother, indelFather, indelMother):
+		snvFatherSet = set(snvFather.keys())
+		snvMotherSet = set(snvMother.keys())
+
+		indelFatherSet = set(indelFather.keys())
+		indelMotherSet = set(indelMother.keys())
+
+		snvCHSet = snvFatherSet & snvMotherSet 
+		#basically.
+		#caveat: the above works on sets whose gene hashes do not have variants that both mother and father have.
+		#should be handled compileParentHash (which works on 1 gene at a time)
+
+		indelCHSet = indelFatherSet & indelMotherSet
+		#probably the same caveat as above
+
+		indelSNVSet = (snvFatherSet & indelMotherSet) | (snvMotherSet & indelFatherSet) #union of two intersects
+		
+		#now have a set of keys which represent genes whose criteria match snvCH, indelCH, indelSNVCH
+		return (snvCHSet, indelCHSet, indelSNVSet)
+		
 	#should return true, fase..?
 	def computeCompoundHet(self, filein=None, fileout=None):
 		#outfile = open('CH_out_1-1_strict_attempt2.txt', 'w')
