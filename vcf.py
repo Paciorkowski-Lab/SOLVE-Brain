@@ -263,26 +263,16 @@ class vcf:
 	##look at all these ops on geneHashes. Its like we're extending dict but dont have the balls to write a geneHash class.
 	
 	#python has sets! omg
-	def computeCH(snvFather, snvMother, indelFather, indelMother):
+	def computeCHetHelper(self, snvFather, snvMother, indelFather, indelMother):
 		snvFatherSet = set(snvFather.keys())
 		snvMotherSet = set(snvMother.keys())
 
 		indelFatherSet = set(indelFather.keys())
 		indelMotherSet = set(indelMother.keys())
 
-		snvCHSet = snvFatherSet & snvMotherSet 
-		#basically.
-		#caveat: the above works on sets whose gene hashes do not have variants that both mother and father have.
-		#should be handled compileParentHash (which works on 1 gene at a time)
-
-		indelCHSet = indelFatherSet & indelMotherSet
-		#probably the same caveat as above
-
-		indelSNVSet = (snvFatherSet & indelMotherSet) | (snvMotherSet & indelFatherSet) #union of two intersects
-		
 		#now have a set of keys which represent genes whose criteria match snvCH, indelCH, indelSNVCH
-		return (snvCHSet, indelCHSet, indelSNVSet)
-		
+		return ((snvFatherSet & indelMotherSet),(snvMotherSet & indelFatherSet))
+	
 	#should return true, fase..?
 	def computeCompoundHet(self, filein=None, fileout=None):
 		#outfile = open('CH_out_1-1_strict_attempt2.txt', 'w')
@@ -309,22 +299,36 @@ class vcf:
 				if len(parentsCH[1]) > 0:
 					self.indelHash['mother'][gene] = parentsCH[1]
 				self.writeHash(gene_dict, fileout + "_indel_CH.vcf")
-		
+	
+		for key in set:
+			variants = father[key]
+			for v in variants:
+				#write	
 		#there could be no snv_indel compHet and therfore should be checked...
 		if (len(self.snvHash['father']) > 0 and len(self.indelHash['mother']) > 0) or (len(self.snvHash['mother']) > 0 and len(self.indelHash['father']) > 0):
+			keySets = self.computeCHetHelper(self.snvHash['father'], self.snvHash['mother'], self.indelHash['father'], self.indelHash['mother'])
 			#compile both subsets of father and mother hashes
-			snvFather_indelMother = self.intersectGeneHash(self.indelHash['mother'], self.snvHash['father'])
-			snvMother_indelFather = self.intersectGeneHash(self.indelHash['father'], self.snvHash['mother'])
+			#snvFather_indelMother = self.intersectGeneHash(self.indelHash['mother'], self.snvHash['father'])
+			#snvMother_indelFather = self.intersectGeneHash(self.indelHash['father'], self.snvHash['mother'])
 			#run compile parentHash on both individually
-			print(snvFather_indelMother)
-			first_half_compiled = self.compileParentHash(snvFather_indelMother)
-			second_half_compiled = self.compileParentHash(snvMother_indelFather)
+			for key in keySets[0]:
+			#	self.writeHash(self.snvFather[keySets[0][key]], fileout + 'snv_indel_CH.vcf')
+			#	self.writeHash(self.indelMother[keySets[0][key]], fileout + 'snv_indel_CH.vcf')
+				self.writeHash(self.snvFather[key])
+				self.writeHash(self.indelMother[key])
+			for key in keySets[1]:
+				self.writeHash(self.indelFather[key])
+				self.writeHash(self.snvMother[key])
+	#print(snvFather_indelMother)
+		#	first_half_compiled = self.compileParentHash(snvFather_indelMother)
+			#second_half_compiled = self.compileParentHash(snvMother_indelFather)
 			#take the returned data and put into snv_indel_hash
 			#need to conceptually think about whether duplicate keys could exist and adding compromised...
-			snv_indel_father = dict(first_half_compiled[0], **second_half_compiled[0])
-			snv_indel_mother = dict(first_half_compiled[1], **second_half_compiled[1])
+			#snv_indel_father = dict(first_half_compiled[0], **second_half_compiled[0])
+			#snv_indel_mother = dict(first_half_compiled[1], **second_half_compiled[1])
 			snv_indel_compiled = dict(snv_indel_father, **snv_indel_mother)
 			#write snv_indel_hash
+			
 			self.writeHash(snv_indel_compiled, fileout + "snv_indel_CH.vcf")
 
 	#in this method, we are looking at variants of this particular gene
@@ -369,7 +373,6 @@ class vcf:
 								motherVariants = {}
 								motherVariants[variantKey] = variantLine
 								compHet['mother'] = motherVariants
-			
 
 #		if (('father' in compHet and 'mother' in compHet) and len(compHet['father']) > 0 and len(compHet['mother']) > 0):
 		return (compHet['father'], compHet['mother'])
