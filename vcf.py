@@ -20,7 +20,8 @@ class vcf:
 		self.filein = None
 		self.fileout = None
 		if self.proband != None:
-			self.false_array = [False for skipped in range(self.proband)]             
+			#self.false_array = [False for skipped in range(self.proband)]   
+			self.false_array = [False] * self.proband         
 		#build gene dict
 		self.geneHash = {}
 		self.snvHash = {"father": {}, "mother": {}}
@@ -83,10 +84,7 @@ class vcf:
 		return [self.absentFather, self.absentMother]
 
 	def computeFam(self, searchStr, line):
-		# print(line)
-		# print(str(self.proband) + ":" + str((self.proband + self.num_affected + self.parent_num)))
 		family = self.mapSearch(searchStr, line.split('\t')[self.proband:(self.proband + self.num_affected + self.parent_num)])
-		# print (self.false_array + family)
 		return self.false_array + family
 
 	#returns an array of [True, False, False, True, etc]
@@ -128,7 +126,6 @@ class vcf:
 	#you can pass in a built in flag if you want
 	# Now only computes two of three when homo is not needed
 	def computeVCFLine(self, line): #filein = None, fileout = None
-		
 		homo = self.computeFam('1/1', line)
 		hetero = self.computeFam('0/1', line)
 		absent = self.computeFam('0/0', line)
@@ -176,18 +173,18 @@ class vcf:
 		#pre: either self.snvFile is there or self.indelFile is there
 		base = fileout 
 		if self.snvFile is filein:
-			print('splitting the snvFile name: ' + self.snvFile + ' into: ' + self.snvFile.split('.vcf')[0])
+			#print('splitting the snvFile name: ' + self.snvFile + ' into: ' + self.snvFile.split('.vcf')[0])
 			base = self.snvFile.split('.vcf')[0] 	
 		elif self.indelFile is filein:
 			base = self.indelFile.split('.vcf')[0] 
 		else:
-			raise ValueError()
+			raise ValueError("No annotated vcf provided")
 
 		if filein != None:
 			self.filein = open(filein, "r")
 		if fileout != None:
 			pedigreeSuffix = "_" + self.prettyPrintPedigree() + ".vcf"
-			print('outputting: ' + base)
+			#print('outputting: ' + base)
 			self.fileout = open(base + pedigreeSuffix, "w")	
 		
 	
@@ -226,7 +223,7 @@ class vcf:
 		for line in self.filein:
 			l = line.split("\t");
 			geneName = l[6]
-			key = ''.join(l[1:5])
+			key = ':'.join(l[0:5])
 			if geneName in geneHash:
 				geneHash[geneName][key] = line
 			else:
@@ -307,30 +304,15 @@ class vcf:
 		#there could be no snv_indel compHet and therfore should be checked...
 		if (len(self.snvHash['father']) > 0 and len(self.indelHash['mother']) > 0) or (len(self.snvHash['mother']) > 0 and len(self.indelHash['father']) > 0):
 			keySets = self.computeCHetHelper(self.snvHash['father'], self.snvHash['mother'], self.indelHash['father'], self.indelHash['mother'])
-			#compile both subsets of father and mother hashes
-			#snvFather_indelMother = self.intersectGeneHash(self.indelHash['mother'], self.snvHash['father'])
-			#snvMother_indelFather = self.intersectGeneHash(self.indelHash['father'], self.snvHash['mother'])
-			#run compile parentHash on both individually
+
 			for key in keySets[0]:
 			#	self.writeHash(self.snvFather[keySets[0][key]], fileout + 'snv_indel_CH.vcf')
 			#	self.writeHash(self.indelMother[keySets[0][key]], fileout + 'snv_indel_CH.vcf')
 				self.writeHash(self.snvHash['father'][key], fileout + '_indel_CH.vcf')
 				self.writeHash(self.indelHash['mother'][key], fileout + '_indel_CH.vcf')
 			for key in keySets[1]:
-				print(key)
 				self.writeHash(self.indelHash['father'][key], fileout + '_indel_CH.vcf')
 				self.writeHash(self.snvHash['mother'][key], fileout + '_indel_CH.vcf')
-	#print(snvFather_indelMother)
-		#	first_half_compiled = self.compileParentHash(snvFather_indelMother)
-			#second_half_compiled = self.compileParentHash(snvMother_indelFather)
-			#take the returned data and put into snv_indel_hash
-			#need to conceptually think about whether duplicate keys could exist and adding compromised...
-			#snv_indel_father = dict(first_half_compiled[0], **second_half_compiled[0])
-			#snv_indel_mother = dict(first_half_compiled[1], **second_half_compiled[1])
-			#snv_indel_compiled = dict(snv_indel_father, **snv_indel_mother)
-			#write snv_indel_hash
-			
-			#self.writeHash(snv_indel_compiled, fileout + "snv_indel_CH.vcf")
 
 	#in this method, we are looking at variants of this particular gene
 	def compileParentHash(self, variantHash): #geneHash[gene] returns a hash of variants for that gene. I know.

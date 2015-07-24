@@ -344,21 +344,21 @@ intermed_combined_files=$combined_basename
 #REPLACE IMMEDIATELY
 	python vcf.py --NUM_AFFECTED=$num_affected --PROBAND=$proband_index --SNV=$active_snv_vcf --INDEL=$active_indel_vcf --PEDIGREE=$pedigree --OUTPUT=$output_base --ABSENT=$absent
 if [ "$pedigree" == "AR" ]; then
-				active_indel_vcf=${indel_basename}_HM.vcf
-				active_snv_vcf=${snv_basename}_HM.vcf
-				indel_vcf_2=${indel_basename}_CH.vcf
-				snv_vcf_2=${snv_basename}_CH.vcf
-				snv_2=1
-				indel_2=1
-				snv_basename=${active_snv_vcf%.*}
-				snv_basename_2=${snv_vcf_2%.*}
-				indel_basename=${active_indel_vcf%.*}
-				indel_basename_2=${indel_vcf_2%.*}
+	active_indel_vcf=${indel_basename}_HM.vcf
+	active_snv_vcf=${snv_basename}_HM.vcf
+	indel_vcf_2=${indel_basename}_CH.vcf
+	snv_vcf_2=${snv_basename}_CH.vcf
+	snv_2=1
+	indel_2=1
+	snv_basename=${active_snv_vcf%.*}
+	snv_basename_2=${snv_vcf_2%.*}
+	indel_basename=${active_indel_vcf%.*}
+	indel_basename_2=${indel_vcf_2%.*}
 else
-				active_indel_vcf=${indel_basename}_${pedigree}.vcf
-				active_snv_vcf=${snv_basename}_${pedigree}.vcf
-				snv_basename=${active_snv_vcf%.*}
-				indel_basename=${active_indel_vcf%.*}
+	active_indel_vcf=${indel_basename}_${pedigree}.vcf
+	active_snv_vcf=${snv_basename}_${pedigree}.vcf
+	snv_basename=${active_snv_vcf%.*}
+	indel_basename=${active_indel_vcf%.*}
 fi      
 				#indel_vcf_2=${output_base}_indels_CH.vcf
         #snv_vcf_2=${output_base}_snv_CH.vcf
