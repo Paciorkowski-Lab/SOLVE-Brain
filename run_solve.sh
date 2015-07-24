@@ -343,10 +343,25 @@ intermed_combined_files=$combined_basename
 #DO NOT NEED
 #REPLACE IMMEDIATELY
 	python vcf.py --NUM_AFFECTED=$num_affected --PROBAND=$proband_index --SNV=$active_snv_vcf --INDEL=$active_indel_vcf --PEDIGREE=$pedigree --OUTPUT=$output_base --ABSENT=$absent
-        active_indel_vcf=${output_base}${pedigree}_indel.vcf
-        active_snv_vcf=${output_base}${pedigree}_snv.vcf
-        indel_vcf_2=${output_base}_indels_CH.vcf
-        snv_vcf_2=${output_base}_snv_CH.vcf
+if [ "$pedigree" == "AR" ]; then
+				active_indel_vcf=${indel_basename}_HM.vcf
+				active_snv_vcf=${snv_basename}_HM.vcf
+				indel_vcf_2=${indel_basename}_CH.vcf
+				snv_vcf_2=${snv_basename}_CH.vcf
+				snv_2=1
+				indel_2=1
+				snv_basename=${active_snv_vcf%.*}
+				snv_basename_2=${snv_vcf_2%.*}
+				indel_basename=${active_indel_vcf%.*}
+				indel_basename_2=${indel_vcf_2%.*}
+else
+				active_indel_vcf=${indel_basename}_${pedigree}.vcf
+				active_snv_vcf=${snv_basename}_${pedigree}.vcf
+				snv_basename=${active_snv_vcf%.*}
+				indel_basename=${active_indel_vcf%.*}
+fi      
+				#indel_vcf_2=${output_base}_indels_CH.vcf
+        #snv_vcf_2=${output_base}_snv_CH.vcf
 
 
 #filter by pedigree
@@ -384,7 +399,7 @@ intermed_combined_files=$combined_basename
 
 # elif [ "$pedigree" == "AR" ]; then
 
-#         #SNV+INDEL compound hets
+         #SNV+INDEL compound hets
 #         if [[ $snv_supplied = 1 && $indel_supplied = 1 ]]; then
 #                 perl "$path_to"comp_het_indels.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index --GENE_INDEX=$gene_index $active_snv_vcf $active_indel_vcf > "$snv_basename"_indels_CH_genes.txt
 #                 active_snv_indel_list="$snv_basename"_indels_CH_genes.txt
@@ -396,7 +411,7 @@ intermed_combined_files=$combined_basename
 #                 fi
 #         fi
 
-#         #SNV + SNV compound hets and AR
+         #SNV + SNV compound hets and AR
 #         if [[ $snv_supplied = 1 ]]; then
 #                 perl "$path_to"multi_hits.pl --GENE_INDEX=$gene_index $active_snv_vcf > "$snv_basename"_multihits.vcf
 #                 perl "$path_to"comp_het_proband.pl --NUM_AFFECTED=$num_affected --PROBAND=$proband_index --GENE_INDEX=$gene_index "$snv_basename"_multihits.vcf > "$snv_basename"_CH.vcf
