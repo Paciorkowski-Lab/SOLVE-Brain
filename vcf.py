@@ -281,24 +281,25 @@ class vcf:
 		#using to test
 		#output_file = open(fileout, "w")
 		geneHash = self.buildGeneHash(filein)
-		for gene in geneHash: #iterates over keys
+		sorted_gene_hash = sorted(geneHash.items(), key = lambda x : int(x[1].items()[0][0].split(':')[0]) if x[1].items()[0][0].split(':')[0] != 'X' else x[1].items()[0][0].split(':')[0])
+		for gene in sorted_gene_hash: #iterates over keys
 			gene_dict = {}
-			parentsCH = self.compileParentHash(geneHash[gene])
+			parentsCH = self.compileParentHash(geneHash[gene[0]])
 			if (len(parentsCH[0]) > 0 and len(parentsCH[1]) > 0) :
 				#some way to out to file. i know. use a method that doesnt exist yet
 				gene_dict = dict(parentsCH[0], **parentsCH[1])
 
 			if self.snvFile is filein:
 				if len(parentsCH[0]) > 0:
-					self.snvHash['father'][gene] = parentsCH[0]
+					self.snvHash['father'][gene[0]] = parentsCH[0]
 				if len(parentsCH[1]) > 0:
-					self.snvHash['mother'][gene] = parentsCH[1]
+					self.snvHash['mother'][gene[0]] = parentsCH[1]
 				self.writeHash(gene_dict, fileout + "_CH.vcf")
 			else:
 				if len(parentsCH[0]) > 0:
-					self.indelHash['father'][gene] = parentsCH[0]
+					self.indelHash['father'][gene[0]] = parentsCH[0]
 				if len(parentsCH[1]) > 0:
-					self.indelHash['mother'][gene] = parentsCH[1]
+					self.indelHash['mother'][gene[0]] = parentsCH[1]
 				self.writeHash(gene_dict, fileout + "_CH.vcf")
 	
 		#there could be no snv_indel compHet and therfore should be checked...

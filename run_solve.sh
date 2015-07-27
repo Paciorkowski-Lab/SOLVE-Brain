@@ -78,7 +78,7 @@ usage="usage:\nsh run_solve.sh [required_arguments] [optional_arguments]\n\nrequ
 #-g <gene_name_index> column index in annotated vcf with name of genes. Setting this value is required if input vcf does not contain header with gene column labeled Gene or Gene.refGene.
 
 echo -e "\nRunning SOLVE-Brain"
-while getopts ":hsnqdra:g:P:i:k:I:S:O:C:" opt; do
+while getopts ":hsnqdra:g:P:i:k:I:S:O:C:A:" opt; do
 case $opt in
 	h)	
 		printf "$usage"
@@ -151,6 +151,10 @@ case $opt in
 		echo "-r intermediate files will be retained"
 		retain_int_files=1
 		;;
+        A)
+                echo "-A absent parents: $OPTARG"
+                absent=$OPTARG
+                ;;
 
         \?)
                 printf "Error: Invalid option: -$OPTARG. $usage"
