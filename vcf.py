@@ -305,16 +305,18 @@ class vcf:
 		#there could be no snv_indel compHet and therfore should be checked...
 		if (len(self.snvHash['father']) > 0 and len(self.indelHash['mother']) > 0) or (len(self.snvHash['mother']) > 0 and len(self.indelHash['father']) > 0):
 			keySets = self.computeCHetHelper(self.snvHash['father'], self.snvHash['mother'], self.indelHash['father'], self.indelHash['mother'])
-
+			geneFile = open(fileout + '_indel_CH_genes.txt', 'w')
+			
 			for key in keySets[0]:
 			#	self.writeHash(self.snvFather[keySets[0][key]], fileout + 'snv_indel_CH.vcf')
 			#	self.writeHash(self.indelMother[keySets[0][key]], fileout + 'snv_indel_CH.vcf')
 				self.writeHash(self.snvHash['father'][key], fileout + '_indel_CH.vcf')
 				self.writeHash(self.indelHash['mother'][key], fileout + '_indel_CH.vcf')
+				geneFile.write(key)
 			for key in keySets[1]:
 				self.writeHash(self.indelHash['father'][key], fileout + '_indel_CH.vcf')
 				self.writeHash(self.snvHash['mother'][key], fileout + '_indel_CH.vcf')
-
+				geneFile.write(key)
 	#in this method, we are looking at variants of this particular gene
 	def compileParentHash(self, variantHash): #geneHash[gene] returns a hash of variants for that gene. I know.
 		compHet = {}
