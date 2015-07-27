@@ -281,7 +281,7 @@ class vcf:
 		#using to test
 		#output_file = open(fileout, "w")
 		geneHash = self.buildGeneHash(filein)
-		sorted_gene_hash = sorted(geneHash.items(), key = lambda x : int(x[1].items()[0][0].split(':')[0]) if x[1].items()[0][0].split(':')[0] != 'X' else x[1].items()[0][0].split(':')[0])
+		sorted_gene_hash = sorted(geneHash.items(), key = lambda x : int(x[1].items()[0][0].split(':')[0]) if x[1].items()[0][0].split(':')[0] != 'X' and x[1].items()[0][0].split(':')[0] != 'Y' else x[1].items()[0][0].split(':')[0])
 		for gene in sorted_gene_hash: #iterates over keys
 			gene_dict = {}
 			parentsCH = self.compileParentHash(geneHash[gene[0]])
