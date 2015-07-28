@@ -1,12 +1,12 @@
 #!/bin/bash
 #
-#bash_auto_solve.sh
+#solve.sh
 #
 #06/04/2015
 #
 #By: Frankie James
 #
-#File that will run the run_solve.sh script provided a Who's-who file where the probands are marked
+#File that will run the core.sh script provided a Who's-who file where the probands are marked
 #The Proband Identifer should be in column 1 and the index for the vcf should be in column 2
 #
 #
@@ -30,9 +30,9 @@ name_of_who_provided=0
 rarity_files_desired=0
 
 whos_who_display=$(printf "\t\t\t%-30s %-30s %-30s %-30s %-30s\n\t\t\t%-30s %-30s %-30s %-30s %-30s\n\t\t\t%-30s %-30s" "COLUMN_1" "COLUMN_2" "COLUMN_3" "COLUMN_4" "COLUMN_5" "PROBAND_IDENTIFIER" "PROBAND_INDEX" "'proband'" "<number_affected>" "<absent parents> (M|F|MF|'')" "OTHER_IDENTIFIER(Parent)" "OTHER_INDEX(if wanted)")
-usage="USAGE:\nThis file is meant to accompany 'run_solve.sh' and should be placed in the same folder.\n\tIt is run in the following manner:\n\tsh solve.sh [ARGUMENTS FOR SOLVE] [ARGUMENTS FOR RUN_SOLVE]\n\nARGUMENTS FOR SOLVE - REQUIRED:\n\tOnly one of the following:\n\n\t\t-i <Who's who file>\n\t\t\tSet up in the following manner(tab delimited):\n$whos_who_display\n\n\t\t-U <Unannotated_VCF_file> used to automatically generate Who's who file.\n\n-O <Output location> (/path/to/output/) with the final '/' included.\n\tNOTE: The output location must not contain any files with 'genes' in the name to avoid ERROR message.\n-Arguments required by run_solve listed below.\n\nARGUMENTS FOR SOLVE - OPTIONAL:\n-T This is our 'Training Wheels' flag and is meant to provide default functionality to those less savy with the command line.\n\tThe 'Training Wheels' option will default to common used functionality without remembering many flags.\n\tThis default run is equivalent to running, -X, -v, -R (Display and pause, Verbose files, Rare_Variant_Files)\n-N <Name_of_whos_who_file> to be used in conjunction with '-U' and will be disregarded otherwise.\n\tNOTE: If no name is provided and a recent whos who file is in output location you will be asked to provide a name not found in the output location.\n-x This will display the results of 'ALL' gene file produced after all probands have run and for all combinations, i.e. ALL_indel_genes and ALL_snv_genes if both are provided.\n-X This will display the results of the ALL gene file with pauses in between different files for clearer output.\n-h Will display the usage of solve as well as run_solve.\n-v Verbose File creator. This will create files that contain not only the gene but the corresponding data from VCF file as well.\n\tNOTE: Can be used with or without the display options ('-x', '-X').\n-R Will produce files that are similar to the files created in Verbose mode (will automatically enable verbose mode) but filtered for only rare variants. i.e. not found in parents outside family.\n\tNOTE: Also added to these files are headings used in the analysis of all rare-genes to be used in conjunction with SOLVE-Brain's web interface. (found at: https://paciorkowski-lab.urmc.rochester.edu/static/code/solve_brain_webi.html)\n$breaker"
+usage="USAGE:\nThis file is meant to accompany 'core.sh' and should be placed in the same folder.\n\tIt is run in the following manner:\n\tsh solve.sh [ARGUMENTS FOR SOLVE] [ARGUMENTS FOR core]\n\nARGUMENTS FOR SOLVE - REQUIRED:\n\tOnly one of the following:\n\n\t\t-i <Who's who file>\n\t\t\tSet up in the following manner(tab delimited):\n$whos_who_display\n\n\t\t-U <Unannotated_VCF_file> used to automatically generate Who's who file.\n\n-O <Output location> (/path/to/output/) with the final '/' included.\n\tNOTE: The output location must not contain any files with 'genes' in the name to avoid ERROR message.\n-Arguments required by core listed below.\n\nARGUMENTS FOR SOLVE - OPTIONAL:\n-T This is our 'Training Wheels' flag and is meant to provide default functionality to those less savy with the command line.\n\tThe 'Training Wheels' option will default to common used functionality without remembering many flags.\n\tThis default run is equivalent to running, -X, -v, -R (Display and pause, Verbose files, Rare_Variant_Files)\n-N <Name_of_whos_who_file> to be used in conjunction with '-U' and will be disregarded otherwise.\n\tNOTE: If no name is provided and a recent whos who file is in output location you will be asked to provide a name not found in the output location.\n-x This will display the results of 'ALL' gene file produced after all probands have run and for all combinations, i.e. ALL_indel_genes and ALL_snv_genes if both are provided.\n-X This will display the results of the ALL gene file with pauses in between different files for clearer output.\n-h Will display the usage of solve as well as core.\n-v Verbose File creator. This will create files that contain not only the gene but the corresponding data from VCF file as well.\n\tNOTE: Can be used with or without the display options ('-x', '-X').\n-R Will produce files that are similar to the files created in Verbose mode (will automatically enable verbose mode) but filtered for only rare variants. i.e. not found in parents outside family.\n\tNOTE: Also added to these files are headings used in the analysis of all rare-genes to be used in conjunction with SOLVE-Brain's web interface. (found at: https://paciorkowski-lab.urmc.rochester.edu/static/code/solve_brain_webi.html)\n$breaker"
 
-printf "$breaker\nRUNNING AUTOMATED RUN_SOLVE:\n"
+printf "$breaker\nRUNNING AUTOMATED core:\n"
 
 while getopts ":vhsnqdrxXTRa:g:P:i:k:I:S:O:C:U:N:" opt
 do
@@ -62,7 +62,7 @@ do
 			;;
 		h)
 			printf "\n$usage\n"
-			sh run_solve.sh -h | grep -v -e "-i" -e "-O"
+			sh core.sh -h | grep -v -e "-i" -e "-O"
 			exit 0
 			;;
 		U)
@@ -217,19 +217,19 @@ do
 	else
 		all_args=$(echo "${@}" | sed -e "s|-U $unanno_vcf|-i $proband_index|;s|-O $output_location|&$proband_identifier|;s|-[xXvVNTR]||g;s|$name_of_who||")
 	fi
-	printf "\nArguments being given to run_solve.sh: -a $number_affected $all_args\n"
+	printf "\nArguments being given to core.sh: -a $number_affected $all_args\n"
 
 	#Successively run data
 	if [[ $absent_parents == "" ]]
 	then
-		sh run_solve.sh -a $number_affected $all_args || bad_exit=1
+		sh core.sh -a $number_affected $all_args || bad_exit=1
 	else
-		sh run_solve.sh -a $number_affected $all_args -A $absent_parents || bad_exit=1
+		sh core.sh -a $number_affected $all_args -A $absent_parents || bad_exit=1
 	fi
 	#Check exit status of run solve before proceeding
 	if [[ $bad_exit == 1 ]]
 	then
-		printf "\n***Run_Solve failed. Please check error message and rerun script.***\n"
+		printf "\n***core failed. Please check error message and rerun script.***\n"
 		rm -f $whos_who_proband
 		exit 1
 	fi
