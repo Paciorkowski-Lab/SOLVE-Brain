@@ -312,8 +312,13 @@ if [[ $display_results == 1 ]] ; then
 		fi
 		echo -e "\n$breaker"
 		echo -e "\nGenes found in ${ALL_file#$output_location}:\n"
-		read -p "Press [Enter] key to continue... (then press 'q' to exit display)"
-		less $ALL_file
+		if [[ $pause_on_display == 1 ]] ; then
+			read -p "Press [Enter] key to continue... (then press 'q' to exit display)"
+			less $ALL_file
+		else
+			cat $ALL_file
+		fi
+		
 		
 	done
 	printf "\nAll files have been printed. Done.\n$breaker\n"
