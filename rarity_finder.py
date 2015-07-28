@@ -74,11 +74,11 @@ def main(argv):
 
             if start_index == families[current_family][0]:
                start_index = proband_indecies[proband_indecies.index(families[current_family][0] + families[current_family][1] - 1) + 1]
-	       print(current_family, start_index)
+	       #print(current_family, start_index)
 
             while start_index < len(line_of_interest) and (start_index < families[current_family][0] or start_index >= proband_indecies[proband_indecies.index(families[current_family][0] + families[current_family][1] - 1) + 1]):
 		
-	       print(current_family, start_index)	
+	       #print(current_family, start_index)	
                genotype = line_of_interest[start_index].split(':')
                alleles = genotype[0].split('/')     
 
@@ -93,7 +93,7 @@ def main(argv):
 			start_index = len(line_of_interest)
 		  else:
                         start_index = proband_indecies[proband_indecies.index(families[current_family][0] + families[current_family][1] - 1) + 1]
-		  print(current_family, start_index)
+		  #print(current_family, start_index)
 
             if number_of_people_with_variant == 0:
                fileout.write(line)

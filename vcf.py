@@ -27,33 +27,6 @@ class vcf:
 		self.snvHash = {"father": {}, "mother": {}}
 		self.indelHash = {"father": {}, "mother": {}}
 
-#		if output != None and pedigree != None:
-			#self.output = output + "_" + pedigree + ".vcf"
-#3		else:
-#			self.output = output + ".vcf"
-
-			
-		#could be better.generalize to input file. outputfile has name snv or indel.
-		# if self.snv != None:
-		# 	print('filein is snv')
-		# 	self.filein = open(self.snv, 'r')
-		# elif self.indel != None:
-		# 	self.filein = open(self.indel, 'r')
-		# else:
-		# 	pass
-			# logging.error('no input files are given')
-			# print('no input files were given')
-			# sys.exit(2)
-		#filein = open('June_2015_snv_exonic.hg19_multianno.txt', 'r')
-	
-		#hard-coded for now. we can determine proband offset based on this. should be a param
-		#indexin = open('June_2015.list', 'rb')
- 
-		# if self.fileout == None:
-		# 	self.fileout = open(self.output, 'w')
-		# 	logging.info('computePedigree(filein, fileout): ' + str(self.filein) + ' , ' + str(self.fileout))
-		# 	print('computePedigree(filein, fileout): ' + str(self.filein) + ' , ' + str(self.fileout))
-	
 	def close(self):	
 		self.filein.close()
 		self.fileout.close()
@@ -256,14 +229,8 @@ class vcf:
 	
 	#verify this later
 	def intersectGeneHash(self, gH1, gH2):
-		for gene in gH2:
-			if gene in gH1:
-				for variant in gH2[gene]:
-					gH1[gene][variant] = gH2[gene][variant]
-		return gH1
+		pass
 
-	##look at all these ops on geneHashes. Its like we're extending dict but dont have the balls to write a geneHash class.
-	
 	#python has sets! omg
 	def computeCHetHelper(self, snvFather, snvMother, indelFather, indelMother):
 		snvFatherSet = set(snvFather.keys())
@@ -277,9 +244,6 @@ class vcf:
 	
 	#should return true, fase..?
 	def computeCompoundHet(self, filein=None, fileout=None):
-		#outfile = open('CH_out_1-1_strict_attempt2.txt', 'w')
-		#using to test
-		#output_file = open(fileout, "w")
 		geneHash = self.buildGeneHash(filein)
 		sorted_gene_hash = sorted(geneHash.items(), key = lambda x : int(x[1].items()[0][0].split(':')[0]) if x[1].items()[0][0].split(':')[0] != 'X' and x[1].items()[0][0].split(':')[0] != 'Y' else x[1].items()[0][0].split(':')[0])
 		for gene in sorted_gene_hash: #iterates over keys
@@ -308,8 +272,6 @@ class vcf:
 			geneFile = open(fileout + '_indel_CH_genes.txt', 'w')
 			
 			for key in keySets[0]:
-			#	self.writeHash(self.snvFather[keySets[0][key]], fileout + 'snv_indel_CH.vcf')
-			#	self.writeHash(self.indelMother[keySets[0][key]], fileout + 'snv_indel_CH.vcf')
 				self.writeHash(self.snvHash['father'][key], fileout + '_indel_CH.vcf')
 				self.writeHash(self.indelHash['mother'][key], fileout + '_indel_CH.vcf')
 				geneFile.write(key)
@@ -330,7 +292,6 @@ class vcf:
 			# was sorting for test purposes, may not need to be...
 			# for variantKey in sorted(variantHash):
 				variantLine = variantHash[variantKey]
-					#proband = self.probandOffset(variantLine, 11) #super hard-coded for now
 					
 				triplet = self.computeVCFLine(variantLine)
 				hetero, inherited, notPresent = triplet['hetero'], triplet['hetero'], triplet['absent']
@@ -360,18 +321,12 @@ class vcf:
 								motherVariants[variantKey] = variantLine
 								compHet['mother'] = motherVariants
 
-#		if (('father' in compHet and 'mother' in compHet) and len(compHet['father']) > 0 and len(compHet['mother']) > 0):
 		return (compHet['father'], compHet['mother'])
-		#else:
-		#	return [False]
 
 	def computeAlleleFreq(self, line):
 		print("in computeallelefreq: " + line)	
 		line = line.split('\t')
-		x = self.mapSearch('GT:AD:DP:GQ:PL', line)  #x marks the spot 
-		arrIndex = 0
-		if x.count(True) > 0:
-			arrIndex = [idx for idx in range(len(x)) if x[idx] == True][0] + 1
+		arrIndex = line.index('GT:AD:DP:GQ:PL') + 1
 		#other info starts at line[arrIndex]
 		print('arrIndex: ' + str(arrIndex))
 		zero_one_count = self.mapSearch('0/1', line[arrIndex:]).count(True)
@@ -379,10 +334,9 @@ class vcf:
 		
 		numSamples = len(line[arrIndex:]) 
 		#- self.mapSearch('./.', line[arrIndex:]).count(True)
-		print {numSamples: numSamples}
-		numBlank = self.mapSearch('./.', line[arrIndex:]).count(True)
+		numBlank = self.mapSearch('\./\.', line[arrIndex:]).count(True)
 		print {numBlank: numBlank}
-		return (float(zero_one_count) + 2.0 * float(one_one_count)) / float(2*numSamples)
+		return (float(zero_one_count) + 2.0 * float(one_one_count)) / float(2*(numSamples-numBlank))
 
 def main(argv):
 	pedigree = '' 
