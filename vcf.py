@@ -55,8 +55,8 @@ class vcf:
 	 
 	#parse absent parents.
 	def parseAbsentParents(self):
-		self.absentFather = re.search('F', self.absent) != None
-		self.absentMother = re.search('M', self.absent) != None
+		self.absentFather = re.search('F', self.absent.upper()) != None
+		self.absentMother = re.search('M', self.absent.upper()) != None
 
 		#added for testing
 		return [self.absentFather, self.absentMother]
