@@ -28,7 +28,7 @@ class vcf:
 		self.indelHash = {"father": {}, "mother": {}}
 
 		#dirty but okay for now
-		if (self.snvFile is not '' and self.indelFile is not ''):
+		if ((self.snvFile is not '' and self.indelFile is not '') and (self.snvFile is not None and self.indelFile is not None)):
 			geneFile = open(self.snvFile.split('.vcf')[0] + '_indel_CH_genes.txt', 'w')
 			geneFile.close()
 
@@ -187,7 +187,7 @@ class vcf:
 			for line in self.filein:
 				if self.computeDN(line):
 					self.fileout.write(line)
-		elif pedigree == 'XL':
+		elif self.pedigree == 'XL':
 			for line in self.filein:
 				if self.computeXL(line):
 					self.fileout.write(line)
