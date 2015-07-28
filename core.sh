@@ -196,7 +196,7 @@ if [[ "$pedigree" = "none" && $retain_int_files = 0 ]]; then
 	retain_int_files=1
 fi
 
-path_to=${0%run_solve.sh}
+path_to=${0%core.sh}
 #search for gene_column index
 if [[ $gene_index_supplied = 0 ]]; then
 	if [[ $combined_vcf_supplied = 1 ]]; then vcf=$combined_vcf
