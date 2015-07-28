@@ -97,7 +97,6 @@ class vcf:
 		return (not self.absentMother and the_array[self.mother]) or self.absentMother
 
 	#you can pass in a built in flag if you want
-	# Now only computes two of three when homo is not needed
 	def computeVCFLine(self, line): #filein = None, fileout = None
 		homo = self.computeFam('1/1', line)
 		hetero = self.computeFam('0/1', line)
@@ -161,8 +160,8 @@ class vcf:
 			self.fileout = open(base + pedigreeSuffix, "w")	
 		
 	
-		print('computePedigree(filein, fileout)')
-		print('\tpedigree: ' + self.pedigree)
+		#print('computePedigree(filein, fileout)')
+		#print('\tpedigree: ' + self.pedigree)
 		self.computeParents()
 		if self.pedigree == 'AR':
 			for line in self.filein:
@@ -289,8 +288,6 @@ class vcf:
 		if len(variantHash) >= 2:
 			for variantKey in variantHash:
 
-			# was sorting for test purposes, may not need to be...
-			# for variantKey in sorted(variantHash):
 				variantLine = variantHash[variantKey]
 					
 				triplet = self.computeVCFLine(variantLine)

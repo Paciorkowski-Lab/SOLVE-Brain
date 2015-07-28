@@ -29,7 +29,7 @@ combined_vcf_provided=0
 name_of_who_provided=0
 rarity_files_desired=0
 
-whos_who_display=$(printf "\t\t\t%-30s %-30s %-30s\n\t\t\t%-30s %-30s %-30s\n\t\t\t%-30s %-30s" "COLUMN_1" "COLUMN_2" "COLUMN_3" "PROBAND_IDENTIFIER" "PROBAND_INDEX" "'proband'" "OTHER_IDENTIFIER(Parent)" "OTHER_INDEX")
+whos_who_display=$(printf "\t\t\t%-30s %-30s %-30s %-30s %-30s\n\t\t\t%-30s %-30s %-30s %-30s %-30s\n\t\t\t%-30s %-30s" "COLUMN_1" "COLUMN_2" "COLUMN_3" "COLUMN_4" "COLUMN_5" "PROBAND_IDENTIFIER" "PROBAND_INDEX" "'proband'" "<number_affected>" "<absent parents> (M|F|MF|'')" "OTHER_IDENTIFIER(Parent)" "OTHER_INDEX(if wanted)")
 usage="USAGE:\nThis file is meant to accompany 'run_solve.sh' and should be placed in the same folder.\n\tIt is run in the following manner:\n\tsh auto_run_solve.sh [ARGUMENTS FOR AUTOMATION] [ARGUMENTS FOR RUN_SOLVE]\n\nARGUMENTS FOR AUTOMATION - REQUIRED:\n\tOnly one of the following:\n\n\t\t-i <Who's who file>\n\t\t\tSet up in the following manner(tab delimited):\n$whos_who_display\n\n\t\t-U <Unannotated_VCF_file> used to automatically generate Who's who file.\n\n-O <Output location> (/path/to/output/) with the final '/' included.\n\tNOTE: The output location must not contain any files with 'genes' in the name to avoid ERROR message.\n-Arguments required by run_solve listed below.\n\nARGUMENTS FOR AUTOMATION - OPTIONAL:\n-T This is our 'Training Wheels' flag and is meant to provide default functionality to those less savy with the command line.\n\tThe 'Training Wheels' option will default to common used functionality without remembering many flags.\n\tThis default run is equivalent to running, -X, -v, -R (Display and pause, Verbose files, Rare_Variant_Files)\n-N <Name_of_whos_who_file> to be used in conjunction with '-U' and will be disregarded otherwise.\n\tNOTE: If no name is provided and a recent whos who file is in output location you will be asked to provide a name not found in the output location.\n-x This will display the results of 'ALL' gene file produced after all probands have run and for all combinations, i.e. ALL_indel_genes and ALL_snv_genes if both are provided.\n-X This will display the results of the ALL gene file with pauses in between different files for clearer output.\n-h Will display the usage of auto_run_solve as well as run_solve.\n-v Verbose File creator. This will create files that contain not only the gene but the corresponding data from VCF file as well.\n\tNOTE: Can be used with or without the display options ('-x', '-X').\n-R Will produce files that are similar to the files created in Verbose mode (will automatically enable verbose mode) but filtered for only rare variants. i.e. not found in parents outside family.\n\tNOTE: Also added to these files are headings used in the analysis of all rare-genes to be used in conjunction with SOLVE-Brain's web interface. (found at: https://paciorkowski-lab.urmc.rochester.edu/static/code/solve_brain_webi.html)\n$breaker"
 
 printf "$breaker\nRUNNING AUTOMATED RUN_SOLVE:\n"
@@ -170,58 +170,14 @@ then
 else
 	if [[ $name_of_who_provided == 1 ]]
 	then
-		usable_whos_who_file=$output_location${name_of_who}.txt
+		usable_whos_who_file=${output_location}${name_of_who}.txt
 	else
 		usable_whos_who_file=${output_location}"Who_is_who_"$(date +"%b_%d_%Y").txt
 	fi
 fi
 
-#now taken care of in whos_who_generator.sh
-
-# Check for any affected siblings. (back to back 'proband' labels)
-#cp "${usable_whos_who_file}" "${usable_whos_who_file%.*}"_Affected.txt
-#affected_whos_who=$(echo "${usable_whos_who_file%.*}_Affected.txt")
-#number_affected=0
-#current_line_number=0
-#IFS=$'\n'
-#for line in $(cat "$affected_whos_who")
-#do
-#        ((current_line_number++))
-#        column_three=$(echo "$line" | awk '{print $3}')
-#        if [[ -n $column_three && $column_three == 'proband' ]]
-#        then
-#                ((number_affected++))
-#        else
-#                if [[ $number_affected != 0 ]]
-#                then
-#                        line_to_append=$((current_line_number - number_affected))
-#                        sed -i "${line_to_append}s/$/\t$number_affected/" $affected_whos_who
-#                        number_affected=0
-#                fi
-#        fi
-#done
-#
-#current_line_number=0
-# remove affected siblings
-#for line in $(cat "$affected_whos_who")
-#do
-#        ((current_line_number++))
-#        column_four=$(echo "$line" | awk '{print $4}')
-#        if [[ -n $column_four && $column_four != 1 ]]
-#        then
-#                starting_line_to_remove=$((current_line_number + 1))
-#                ending_line_to_remove=$((current_line_number + column_four - 1))
-#                sed -i "${starting_line_to_remove},${ending_line_to_remove}d" $affected_whos_who
-#                current_line_number=$((current_line_number - column_four + 1))
-#        fi
-#done
-#unset IFS
-
-#cat "$affected_whos_who" | grep proband > "${affected_whos_who%.*}"_proband.txt
-#whos_who_proband=$(echo "${affected_whos_who%.*}_proband.txt")
-
-cat "$usable_whos_who_file" | grep proband > "${usable_whos_who%.*}"_proband.txt
-whos_who_proband=$(echo "${usable_whos_who%.*}_proband.txt")
+cat "$usable_whos_who_file" | grep proband > "${usable_whos_who_file%.*}"_proband.txt
+whos_who_proband=$(echo "${usable_whos_who_file%.*}_proband.txt")
 proband_number=$(cat $whos_who_proband | wc -l)
 rm -f $affected_whos_who
 
@@ -355,12 +311,10 @@ if [[ $display_results == 1 ]] ; then
 			clear
 		fi
 		echo -e "\n$breaker"
-		echo -e "\nGenes found in ${ALL_file#$output_location}:"
-		cat $ALL_file
-		if [[ $pause_on_display == 1 ]] ; then
-			echo
-			read -p "Press [Enter] key to continue..."
-		fi
+		echo -e "\nGenes found in ${ALL_file#$output_location}:\n"
+		read -p "Press [Enter] key to continue... (then press 'q' to exit display)"
+		less $ALL_file
+		
 	done
 	printf "\nAll files have been printed. Done.\n$breaker\n"
 else 
