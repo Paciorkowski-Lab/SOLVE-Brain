@@ -28,8 +28,8 @@ class vcf:
 		self.indelHash = {"father": {}, "mother": {}}
 
 		#dirty but okay for now
-		if (self.snvFile != '' and self.indelFile != ''):
-			geneFile = open(fileout + '_indel_CH_genes.txt', 'w')
+		if (self.snvFile is not '' and self.indelFile is not ''):
+			geneFile = open(self.snvFile.split('.vcf')[0] + '_indel_CH_genes.txt', 'w')
 			geneFile.close()
 
 	def close(self):	
