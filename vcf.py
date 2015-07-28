@@ -27,6 +27,11 @@ class vcf:
 		self.snvHash = {"father": {}, "mother": {}}
 		self.indelHash = {"father": {}, "mother": {}}
 
+		#dirty but okay for now
+		if (self.snvFile != '' and self.indelFile != ''):
+			geneFile = open(fileout + '_indel_CH_genes.txt', 'w')
+			geneFile.close()
+
 	def close(self):	
 		self.filein.close()
 		self.fileout.close()
@@ -269,7 +274,7 @@ class vcf:
 		#there could be no snv_indel compHet and therfore should be checked...
 		if (len(self.snvHash['father']) > 0 and len(self.indelHash['mother']) > 0) or (len(self.snvHash['mother']) > 0 and len(self.indelHash['father']) > 0):
 			keySets = self.computeCHetHelper(self.snvHash['father'], self.snvHash['mother'], self.indelHash['father'], self.indelHash['mother'])
-			geneFile = open(fileout + '_indel_CH_genes.txt', 'w')
+			geneFile = open(fileout + '_indel_CH_genes.txt', 'a')
 			
 			for key in keySets[0]:
 				self.writeHash(self.snvHash['father'][key], fileout + '_indel_CH.vcf')
