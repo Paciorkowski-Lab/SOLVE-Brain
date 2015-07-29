@@ -96,7 +96,7 @@ do
 			rarity_files_desired=1
 			;;
 		T)
-			printf "\n-T 'Training Wheels' enabled."
+			printf "\n-T 'Training Wheels' enabled.\n"
                         verbose_desired=1
                         display_results=1
                         pause_on_display=1
@@ -217,13 +217,15 @@ do
 	else
 		all_args=$(echo "${@}" | sed -e "s|-U $unanno_vcf|-i $proband_index|;s|-O $output_location|&$proband_identifier|;s|-[xXvVNTR]||g;s|$name_of_who||")
 	fi
-	printf "\nArguments being given to core.sh: -a $number_affected $all_args\n"
+	
 
 	#Successively run data
 	if [[ $absent_parents == "" ]]
 	then
+		printf "\nArguments being given to core.sh: -a $number_affected $all_args\n"
 		sh core.sh -a $number_affected $all_args || bad_exit=1
 	else
+		printf "\nArguments being given to core.sh: -a $number_affected $all_args -A $absent_parents\n"
 		sh core.sh -a $number_affected $all_args -A $absent_parents || bad_exit=1
 	fi
 	#Check exit status of run solve before proceeding

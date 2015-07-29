@@ -28,7 +28,7 @@ class vcf:
 		self.indelHash = {"father": {}, "mother": {}}
 
 		#dirty but okay for now
-		if ((self.snvFile is not '' and self.indelFile is not '') and (self.snvFile is not None and self.indelFile is not None)):
+		if (file_check(self.snvFile) == 1 and file_check(self.indelFile) == 1):
 			geneFile = open(self.snvFile.split('.vcf')[0] + '_indel_CH_genes.txt', 'w')
 			geneFile.close()
 
@@ -340,6 +340,13 @@ class vcf:
 		print {numBlank: numBlank}
 		return (float(zero_one_count) + 2.0 * float(one_one_count)) / float(2*(numSamples-numBlank))
 
+def file_check(fn):
+    try:
+      open(fn, "r")
+      return 1
+    except IOError:
+      return 0
+
 def main(argv):
 	pedigree = '' 
 	proband = '' 
@@ -373,7 +380,7 @@ def main(argv):
 			indel = arg
 		elif opt in ('--PEDIGREE', '-P'):
 			pedigree = arg
-			print('pedigree: ' + pedigree)
+			#print('pedigree: ' + pedigree)
 		elif opt in ('--ABSENT', '-A'):
 			absent = arg #new argument. 
 		#	parseAbsentParent() #do it right away
@@ -382,14 +389,16 @@ def main(argv):
 
 	#will be indel or snv
 	logging.info('Done capturing params')
-	print('Done capturing params')
+	#print('Done capturing params')
  
 	x = vcf(proband, num_affected, absent, snv, indel, pedigree, output)
 	#x.buildGeneHash()
+
+
 	
-	if indel is not '':	
+	if file_check(indel) == 1:	
 		x.computePedigree(indel, output)
-	if snv is not '':
+	if file_check(snv) == 1:
 		x.computePedigree(snv, output)
 
 
