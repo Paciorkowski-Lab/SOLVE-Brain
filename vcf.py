@@ -341,11 +341,14 @@ class vcf:
 		return (float(zero_one_count) + 2.0 * float(one_one_count)) / float(2*(numSamples-numBlank))
 
 def file_check(fn):
-    try:
-      open(fn, "r")
-      return 1
-    except IOError:
-      return 0
+	if isinstance(fn, str):
+	    try:
+	      open(fn, "r")
+	      return 1
+	    except IOError:
+	      return 0
+	else:
+		return 0
 
 def main(argv):
 	pedigree = '' 
