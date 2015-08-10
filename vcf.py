@@ -4,8 +4,12 @@ import logging, sys, getopt, re
 class vcf: 
 	
 	def __init__(self, proband_index = None, num_affected = None, absent = None, snv = None, indel = None, pedigree = None, output = None):
-		self.proband = int(proband_index)
-		self.num_affected = int(num_affected)
+		self.proband = None
+		if proband_index != None:
+			self.proband = int(proband_index)
+		self.num_affected = None 
+		if num_affected != None:
+			self.num_affected = int(num_affected)
 		self.absent = absent
 		self.snvFile = snv
 		self.indelFile = indel
@@ -328,7 +332,10 @@ class vcf:
 	def computeAlleleFreq(self, line):
 		print("in computeallelefreq: " + line)	
 		line = line.split('\t')
-		arrIndex = line.index('GT:AD:DP:GQ:PL') + 1
+		x = self.mapSearch('GT:AD:DP:GQ:PL', line) #x marks the spot
+		arrIndex = 0
+		if x.count(True) > 0:
+			arrIndex = [idx for idx in range(len(x)) if x[idx] == True][0] + 1 
 		#other info starts at line[arrIndex]
 		print('arrIndex: ' + str(arrIndex))
 		zero_one_count = self.mapSearch('0/1', line[arrIndex:]).count(True)
