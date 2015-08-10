@@ -22,15 +22,8 @@ def main():
 				fileout.write(thing + '\t')
 			fileout.write(line.split('\t')[11] + '\t' + str(freq) + '\n')
 		fileout.write('\n')
-	#print x
-#for line in filein:
-#	for entry in vcf:
-#		variant = map(lambda x: re.search(line.split('\n')[0], x) != None, entry.split())
-#		if any(variant):
-#			print entry
-#filein.close()
-#fileout.close()
-#vcf.close()
+	filein.close()
+	fileout.close()
 
 if __name__ == "__main__":
 	main()
