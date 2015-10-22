@@ -1,11 +1,11 @@
-SOLVE-Brain 1.0.3
+SOLVE-Brain 1.0.4
 ===========
 
 Brain-specific annotation of next-generation sequencing data. 
 
-Release date 25 November 2014
+Release date 22 October 2015
 
-Authors: Dalia Ghoneim, Alex Paciorkowski
+Authors: Dalia Ghoneim, Francis James, Jimmy Zhang, Alex Paciorkowski
 
 The Paciorkowski Lab
 
