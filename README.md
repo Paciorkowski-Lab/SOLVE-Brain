@@ -5,7 +5,7 @@ Brain-specific annotation of next-generation sequencing data.
 
 Release date 22 October 2015
 
-Authors: Dalia Ghoneim, Francis James, Jimmy Zhang, Alex Paciorkowski
+Authors: Dalia Ghoneim, Francis James, Jimmy Zhang, Jeff Clegg, Alex Paciorkowski
 
 The Paciorkowski Lab
 
