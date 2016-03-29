@@ -84,30 +84,54 @@ When running SOLVE-Brain you have two options for letting the program know how y
 This software makes use of command line flags or options in order to know exactly what it is the user wants to happen. It is recommended that you look at the usage which can be accessed by running 'sh solve.sh -h' in the command line, however a small summary will be provided here.
 
 To start, the software is looking for a couple required flags in which it cannot run without. The following are flags you must include:
+
 	-P followed by a two letter pedigree hypothesis. (DN, AR, AD, XL, none)
+	
 	-O followed by the path to your output location.
+	
 	AT LEAST one of the following:
+	
 		-S followed by the path to your Annovar annotated snv file.
+		
 		-I followed by the path to your Annovar annotated indel file.
+		
 			*Note: it is common to run both the snv and indel files simultanously.
+			
 		-C followed by the path to your Annovar annotated combined snv/indel file.
+		
 	ONLY one of the following:
+	
 		-i followed by the path to your Who is who file described above.
+		
 		-U followed by the path to your Unannotated vcf file. (type does not matter)
+		
 
 The following are optional flags that can be used depending on your data/needs:
+
 	-T 'Training Wheels', this will default enable a few commonly used flags: -X, -v, -R will all be enabled.
+	
 	-g followed by the index of gene names in your annotated vcf (if not labeled) 
+	
 	-N followed by the desired name of Who is who file. (only if -U also used)
+	
 		*Note: if -U is used and -N is not, the Who is who file will be named with the date. 
+		
 	-d will have the program NOT filter out known SNPs.
+	
 	-q will have the program NOT filter out varation with GQ scores less than 99.
+	
 	-k will have the program cross reference found variation with a list of known genes. (provided in a seperate file)
+	
 	-x will display the outputed 'ALL' gene file. (List of all found genes for cohort)
+	
 	-X same as '-x' with pauses in between files for clearer visualization.
+	
 		*NOTE: if verbose mode is activated, verbose files will display after the consolidated gene files.
+		
 	-v will create 'VERBOSE' files that also contain the raw data related to found variation.
+	
 	-R will create files similar to verbose, filtering out variants found in other families (unless only in probands) as these are unlikely disease causing.
+	
 		*NOTE: for variants that are not filtered out, a convenient Analysis section is added after all variants are listed for a gene. (this matches with the available searches on SOLVE-Brain's web interface)
 
 
